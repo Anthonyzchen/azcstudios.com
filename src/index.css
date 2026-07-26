@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Inter", system-ui, sans-serif;
+
+  /* Motion tokens — mirror of src/lib/motion.js, for CSS transitions */
+  --ease-ink: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 0.4s;
+  --dur-base: 0.7s;
+  --dur-slow: 1.1s;
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* Anchor jumps land softly rather than snapping */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Keyboard focus stays visible everywhere — the studio site has no custom
+   focus styling, so lean on the browser ring but give it room. */
+:focus-visible {
+  outline: 2px solid theme("colors.ink");
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@layer utilities {
+  /* Hairline rule that reads as a fold in paper rather than a border */
+  .rule-top {
+    border-top: 1px solid theme("colors.line");
+  }
+  .rule-bottom {
+    border-bottom: 1px solid theme("colors.line");
+  }
+}
+
+/* Honor reduced-motion for CSS animations + transitions.
+   GSAP timelines are gated separately in usePageEntrance. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

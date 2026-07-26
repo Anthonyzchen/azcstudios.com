@@ -1,0 +1,13 @@
+[
+  {
+    "slug": "recallguard",
+    "name": "RecallGuard",
+    "platform": "iPhone",
+    "status": "In development",
+    "tagline": "FDA food recall alerts, filtered to your household.",
+    "summary": "Most recall apps send every recall to every user. RecallGuard filters the FDA's feed down to the allergens you track, the products you've actually bought, and the state you live in — then tells you which ones matter.",
+    "href": "/recallguard",
+    "appStoreUrl": null,
+    "accentClass": "bg-rg"
+  }
+]
