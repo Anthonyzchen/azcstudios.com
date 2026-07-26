@@ -52,11 +52,30 @@ properties share one easing curve and duration scale. Import `EASE` /
 
 ## Deployment
 
-Cloudflare Pages, auto-deploying on push to `main`. Framework preset Vite,
-build `npm run build`, output `dist`, `NODE_VERSION=20`.
+Cloudflare **Workers** (static assets), auto-deploying on push to `main`.
+Not Pages — Cloudflare's dashboard no longer offers a Pages option when
+connecting a new Git repo, so this project takes the Workers path even though
+`anthonyzchen.com` predates that change and remains a Pages project.
 
-`public/_redirects` carries the SPA fallback — without it, a hard refresh on
-any route but `/` 404s.
+Workers Builds settings:
+
+| Field | Value |
+|---|---|
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy` |
+| `NODE_VERSION` | `20` |
+
+`wrangler.jsonc` holds the rest. `not_found_handling: "single-page-application"`
+is what makes a hard refresh on `/recallguard/privacy` work — it's the Workers
+equivalent of the `/* /index.html 200` line a Pages project keeps in
+`public/_redirects`. That file was removed; do not add it back unless this
+moves to Pages, since two competing fallback declarations is worse than one.
+
+Custom domains attach at Worker → Settings → Domains & Routes → Add → Custom
+Domain, which writes the DNS record automatically. **Apex and `www` are
+separate** — a Worker bound to `azcstudios.com` does not receive
+`www.azcstudios.com`, so both must be added (or `www` handled by a redirect
+rule).
 
 ## Known gaps
 

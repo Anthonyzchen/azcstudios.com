@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "azcstudios-com",
+  "compatibility_date": "2026-07-26",
+  "assets": {
+    "directory": "./dist/",
+    // Serves index.html for any path that isn't a real file, so client-side
+    // routes like /recallguard/privacy survive a hard refresh. This is the
+    // Workers-native replacement for the `/* /index.html 200` line that a
+    // Cloudflare Pages project would carry in public/_redirects.
+    "not_found_handling": "single-page-application"
+  }
+}
