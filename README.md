@@ -63,7 +63,11 @@ Workers Builds settings:
 |---|---|
 | Build command | `npm run build` |
 | Deploy command | `npx wrangler deploy` |
-| `NODE_VERSION` | `20` |
+
+No `NODE_VERSION` variable — Workers Builds defaults to Node 22, which
+satisfies Vite 5, Wrangler 4, and ESLint 9. Setting it to 20 (as the Pages
+project does, because Pages defaults to a much older Node) would only pin the
+build backward.
 
 `wrangler.jsonc` holds the rest. `not_found_handling: "single-page-application"`
 is what makes a hard refresh on `/recallguard/privacy` work — it's the Workers
