@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import products from "../data/products.json";
+import kitchenPhoto from "../assets/images/recallguard-kitchen.jpg";
 import { usePageEntrance } from "../lib/usePageEntrance";
 import { Section, Paragraph, List, FaqItem } from "../components/ui";
 import { STUDIO_NAME } from "../lib/site";
@@ -26,15 +27,19 @@ const ImageSlot = ({ label, aspect = "aspect-[16/10]", className = "" }) => (
 const FEATURES = [
   {
     title: "Your allergens, alerted first",
-    body: "Pick the allergens your household reacts to — milk, peanut, tree nut, sesame, any of the FDA's nine. Every recall gets filtered against that list, and when one names an allergen you track, the push notification leads with the allergen, not the brand.",
+    body: "Pick the allergens your household reacts to: milk, peanut, tree nut, sesame, any of the FDA's nine. Every recall gets filtered against that list, and when one names an allergen you track, the push notification leads with the allergen, not the brand.",
   },
   {
     title: "Your pantry, matched automatically",
-    body: "Add what you've bought by typing it, scanning the barcode, or photographing the receipt. When a recall hits one of those products, the alert says your item is recalled — not that you should go check.",
+    body: "Add what you've bought by typing it, scanning the barcode, or photographing the receipt. When a recall hits one of those products, the alert says your item is recalled, not that you should go check.",
   },
   {
     title: "Pet food, as the FDA publishes it",
-    body: "Pet food recalls get far less coverage than human food recalls and rarely reach the news. RecallGuard ingests the FDA's animal-food recalls as they publish and surfaces the ones that touch a species in your household.",
+    body: "Pet food recalls get far less coverage than human food recalls and rarely reach the news. RecallGuard reads the FDA's animal-food feed and flags the recalls that touch a species in your household.",
+  },
+  {
+    title: "Your whole household, not just you",
+    body: "Link up to four households so an alert reaches whoever actually opens the fridge. One person adds the groceries; everyone who eats them gets told.",
   },
 ];
 
@@ -61,7 +66,7 @@ const FAQS = [
   {
     question: "Where does the recall data come from?",
     answer:
-      "The FDA's public recall data for human food and animal food. RecallGuard reads that feed on a schedule, extracts the product identifiers, and matches them against your profile and pantry. It does not republish, alter, or editorialize the FDA's findings.",
+      "Two public government sources: the FDA, which covers most human food and animal food, and USDA FSIS, which covers meat, poultry, and egg products. RecallGuard reads both feeds on a schedule, extracts the product identifiers, and matches them against your profile and pantry. It does not republish, alter, or editorialize either agency's findings.",
   },
   {
     question: "Is there a free tier?",
@@ -71,7 +76,7 @@ const FAQS = [
   {
     question: "How does receipt scanning work?",
     answer:
-      "You photograph a grocery receipt and the app reads the line items, then shows them to you for review before anything lands in your pantry. You confirm or correct the parse — nothing is added silently.",
+      "You photograph a grocery receipt and the app reads the line items, then shows them to you for review before anything lands in your pantry. You confirm or correct the parse. Nothing is added silently.",
   },
   {
     question: "Do I have to add a pantry to get value?",
@@ -113,8 +118,8 @@ const RecallGuard = () => {
             </h1>
 
             <p className="mb-8 max-w-prose text-lede text-graphite">
-              RecallGuard watches FDA food and pet food recalls and alerts you
-              the moment one names an allergen you track, a species in your
+              RecallGuard watches FDA and USDA food recalls and tells you the
+              same day one names an allergen you track, a species in your
               household, or a product in your pantry.
             </p>
 
@@ -141,16 +146,25 @@ const RecallGuard = () => {
               </div>
             )}
 
+            {/* No price until the App Store listing is live — marketing/claims.md
+                bans stated pricing pre-launch, since a number published now and
+                changed at launch is worse than no number. */}
             <p className="mt-4 text-sm text-graphite/70">
-              $49.99 per year after a 14-day free trial. Cancel anytime in iOS
-              Settings.
+              Starts with a 14-day free trial. Cancel anytime in iOS Settings.
             </p>
           </div>
 
-          <ImageSlot
-            label="Hero screenshot — pending"
-            aspect="aspect-[4/5]"
-            className="mx-auto max-w-sm"
+          {/* Editorial photo, not a product shot. Per assets/editorial/CREDITS.md
+              these run as atmosphere behind type — never as the thing claiming
+              to be a recalled product. Pexels license, free commercial, no
+              attribution required. No faces, no legible brands. */}
+          <img
+            src={kitchenPhoto}
+            alt="A carton of eggs on a floured wooden counter beside a whisk"
+            width="778"
+            height="1100"
+            loading="eager"
+            className="mx-auto aspect-[4/5] w-full max-w-sm rounded-2xl object-cover"
           />
         </div>
       </section>
@@ -166,20 +180,21 @@ const RecallGuard = () => {
               screens down.
             </Paragraph>
             <Paragraph>
-              RecallGuard inverts it. You say what matters — your allergens,
-              your pets, what you actually buy — and the app filters the FDA's
+              RecallGuard inverts it. You say what matters (your allergens, your pets, what you actually buy) and the app filters the FDA's
               stream down to the recalls that could plausibly reach your
               kitchen. Everything else stays in the feed, unread, where it
               belongs.
             </Paragraph>
           </div>
-          <ImageSlot label="Feed screenshot — pending" />
+          <ImageSlot label="Feed screenshot pending" />
         </div>
       </Section>
 
       {/* Features */}
       <Section eyebrow="Features" title="What it does">
-        <div className="grid gap-8 sm:grid-cols-3">
+        {/* Two columns, not three — four features in a 3-col grid orphans the
+            last one. 2x2 balances and leaves the copy readable. */}
+        <div className="grid gap-x-12 gap-y-10 sm:grid-cols-2">
           {FEATURES.map((feature) => (
             <div key={feature.title}>
               <div
@@ -194,26 +209,24 @@ const RecallGuard = () => {
           ))}
         </div>
 
-        {/* Coverage note — see the ingestion-gap flag in the build plan.
-            Pet/animal-food ingestion is live but shallow, and USDA FSIS
-            (meat, poultry, egg) is not a source yet. Stating that plainly
-            here rather than letting the feature copy imply full coverage. */}
+        {/* Coverage note. Both agencies are live sources: FDA (human + animal
+            food) and USDA FSIS (meat, poultry, egg) — see poll-fda-recalls and
+            poll-fsis-recalls. Poll cadence is stated honestly here because
+            claims.md bans real-time phrasing. */}
         <div className="mt-12 rounded-2xl border border-line bg-paper-sunk p-6 sm:p-8">
           <h3 className="mb-3 font-Fraunces text-lg text-ink">
-            What's covered today
+            What's covered
           </h3>
           <Paragraph className="mb-4">
-            RecallGuard's coverage comes from the FDA. That means it does not
-            currently include USDA-regulated recalls — meat, poultry, and egg
-            products fall under USDA FSIS, a separate agency with a separate
-            feed. Pet food coverage is live but the FDA's animal-food feed is
-            shallower than its human-food feed, so historical pet recalls are
-            thin.
+            Two agencies, because food safety is split between them. The FDA
+            covers most human food plus animal food. USDA FSIS covers meat,
+            poultry, and egg products. RecallGuard reads both, so a beef recall
+            and a cookie recall reach you the same way.
           </Paragraph>
           <Paragraph>
-            Both are things we intend to fix, and this section will change when
-            they are fixed. Until then it's better that you know the shape of
-            the gap.
+            Alerts land the same day the agency posts the recall, not the
+            instant it happens. We poll the feeds on a schedule rather than
+            claiming a real-time pipe we don't have.
           </Paragraph>
         </div>
       </Section>
@@ -260,13 +273,16 @@ const RecallGuard = () => {
         </div>
       </Section>
 
-      {/* Pricing */}
+      {/* Pricing — the figure itself is deliberately absent until the App Store
+          listing is live. See marketing/claims.md "Pre-launch reality". */}
       <Section eyebrow="Pricing" title="One subscription, no free tier">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-16">
           <div className="rounded-2xl border border-line bg-white/60 p-8">
-            <p className="mb-2 font-Fraunces text-4xl text-ink">$49.99</p>
+            <p className="mb-2 font-Fraunces text-3xl text-ink">
+              14 days free
+            </p>
             <p className="mb-6 text-sm text-graphite/70">
-              per year, after a 14-day free trial
+              then one annual subscription, priced at launch
             </p>
             <List
               items={[
@@ -283,10 +299,10 @@ const RecallGuard = () => {
 
           <div className="space-y-5">
             <Paragraph>
-              The subscription pays for FDA ingestion, the matching engine,
-              receipt parsing, and Apple's cut. There is no free tier because
-              the honest versions of "free" all involve selling something that
-              isn't ours to sell.
+              The subscription pays for FDA and USDA ingestion, the matching
+              engine, receipt parsing, and Apple's cut. There is no free tier
+              because the honest versions of "free" all involve selling
+              something that isn't ours to sell.
             </Paragraph>
             <Paragraph>
               If that math doesn't work for you, the FDA publishes a free recall

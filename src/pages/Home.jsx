@@ -121,7 +121,7 @@ const Home = () => {
       {/* Contact */}
       <Section eyebrow="Contact" title="Get in touch" id="contact">
         <Paragraph className="mb-6 max-w-prose">
-          Questions about a product, press, or partnerships — this address
+          Questions about a product, press, or partnerships. This address
           reaches us directly.
         </Paragraph>
         <CopyEmail email={SUPPORT_EMAIL} variant="button" />

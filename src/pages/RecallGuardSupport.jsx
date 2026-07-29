@@ -16,17 +16,17 @@ const FAQS = [
   {
     question: "I'm not receiving any notifications.",
     answer:
-      "Check three things in order. First, iOS Settings > Notifications > RecallGuard — make sure Allow Notifications is on. Second, in the app's Preferences, confirm you've set a state and at least one allergen, brand, or pantry item; with an empty profile there is nothing to match against. Third, remember that Class III recalls never push by design — they appear in the feed only. If all three check out, email us with your account address.",
+      "Check three things in order. First, iOS Settings > Notifications > RecallGuard, and make sure Allow Notifications is on. Second, in the app's Preferences, confirm you've set a state and at least one allergen, brand, or pantry item; with an empty profile there is nothing to match against. Third, remember that Class III recalls never push by design; they appear in the feed only. If all three check out, email us with your account address.",
   },
   {
     question: "A recall I heard about isn't in my feed.",
     answer:
-      "The most common reason is that it isn't an FDA recall. Meat, poultry, and egg product recalls are regulated by USDA FSIS, which is a separate agency and not currently a data source for RecallGuard. The second most common reason is filtering — if the recall doesn't touch your state, allergens, or pantry, it won't surface. You can widen your filters in Preferences.",
+      "Usually filtering. If the recall doesn't touch your state, your allergens, or something in your pantry, it won't surface. That's the app working as intended. You can widen your filters in Preferences. Timing is the other common reason: we read the FDA and USDA feeds on a schedule, so a recall that broke in the news minutes ago may not have reached the agency feed yet.",
   },
   {
     question: "The receipt scan got items wrong.",
     answer:
-      "Receipt parsing shows you every line item for review before anything is saved, so you can correct or remove items at that step. If a particular receipt parses badly and you're willing to share it, email it to us — real receipts are how the parser gets better.",
+      "Receipt parsing shows you every line item for review before anything is saved, so you can correct or remove items at that step. If a particular receipt parses badly and you're willing to share it, email it to us. Real receipts are how the parser gets better.",
   },
   {
     question: "How do I cancel my subscription?",
@@ -49,9 +49,9 @@ const FAQS = [
       "All of it lives in Preferences and all of it is editable at any time. Nothing you set during onboarding is permanent, and every field can be left blank.",
   },
   {
-    question: "Is RecallGuard affiliated with the FDA?",
+    question: "Is RecallGuard affiliated with the FDA or USDA?",
     answer:
-      "No. RecallGuard reads the FDA's public recall data and is not affiliated with, endorsed by, or speaking for the FDA. For the official source, see fda.gov/safety/recalls-market-withdrawals-safety-alerts.",
+      "No. RecallGuard reads public recall data published by both agencies and is not affiliated with, endorsed by, or speaking for either one. For the official sources, see fda.gov/safety/recalls-market-withdrawals-safety-alerts and fsis.usda.gov/recalls.",
   },
 ];
 
