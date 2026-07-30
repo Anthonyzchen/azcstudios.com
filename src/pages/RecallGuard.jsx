@@ -2,27 +2,12 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import products from "../data/products.json";
 import kitchenPhoto from "../assets/images/recallguard-kitchen.jpg";
+import feedScreenshot from "../assets/images/recallguard-feed.webp";
 import { usePageEntrance } from "../lib/usePageEntrance";
 import { Section, Paragraph, List, FaqItem } from "../components/ui";
 import { STUDIO_NAME } from "../lib/site";
 
 const product = products.find((p) => p.slug === "recallguard");
-
-/**
- * Placeholder for imagery that doesn't exist yet. Every landing-page visual in
- * the marketing asset plan is still TODO and there are no real app captures to
- * use, so these render as labelled empty frames rather than stand-in art.
- * Replace with <img> once real assets land.
- */
-const ImageSlot = ({ label, aspect = "aspect-[16/10]", className = "" }) => (
-  <div
-    className={`${aspect} ${className} flex w-full items-center justify-center rounded-2xl border border-dashed border-line bg-paper-sunk`}
-  >
-    <p className="px-6 text-center text-xs uppercase tracking-[0.2em] text-graphite/40">
-      {label}
-    </p>
-  </div>
-);
 
 const FEATURES = [
   {
@@ -188,7 +173,18 @@ const RecallGuard = () => {
               belongs.
             </Paragraph>
           </div>
-          <ImageSlot label="Feed screenshot pending" />
+          {/* Real capture from the build in progress, not a mockup. Cropped to
+              the feed itself: the protection header above it reads "0 items
+              watched" on a fresh account, which argues against the product.
+              Re-shoot with a populated pantry once the app is polished. */}
+          <img
+            src={feedScreenshot}
+            alt="RecallGuard's recall feed, showing FDA and USDA recalls with severity labels"
+            width="660"
+            height="1127"
+            loading="lazy"
+            className="mx-auto w-full max-w-[300px] rounded-[1.75rem] border border-line shadow-sm"
+          />
         </div>
       </Section>
 
