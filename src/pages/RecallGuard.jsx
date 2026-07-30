@@ -146,11 +146,13 @@ const RecallGuard = () => {
               </div>
             )}
 
-            {/* No price until the App Store listing is live — marketing/claims.md
-                bans stated pricing pre-launch, since a number published now and
-                changed at launch is worse than no number. */}
+            {/* $50/yr is the confirmed launch price (Anthony, 2026-07-29),
+                superseding the earlier $49.99. Keep this, the Terms, and the
+                App Store Connect IAP price identical — they are the same
+                promise made in three places. */}
             <p className="mt-4 text-sm text-graphite/70">
-              Starts with a 14-day free trial. Cancel anytime in iOS Settings.
+              $50 per year after a 14-day free trial. Cancel anytime in iOS
+              Settings.
             </p>
           </div>
 
@@ -273,16 +275,12 @@ const RecallGuard = () => {
         </div>
       </Section>
 
-      {/* Pricing — the figure itself is deliberately absent until the App Store
-          listing is live. See marketing/claims.md "Pre-launch reality". */}
       <Section eyebrow="Pricing" title="One subscription, no free tier">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-16">
           <div className="rounded-2xl border border-line bg-white/60 p-8">
-            <p className="mb-2 font-Fraunces text-3xl text-ink">
-              14 days free
-            </p>
+            <p className="mb-2 font-Fraunces text-4xl text-ink">$50</p>
             <p className="mb-6 text-sm text-graphite/70">
-              then one annual subscription, priced at launch
+              per year, after a 14-day free trial
             </p>
             <List
               items={[

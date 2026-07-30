@@ -46,7 +46,7 @@ const RecallGuardTerms = () => {
           Terms of Service
         </h1>
         <p className="text-sm text-graphite/70">
-          RecallGuard &mdash; Last updated July 26, 2026
+          RecallGuard &mdash; Last updated July 29, 2026
         </p>
       </div>
 
@@ -154,7 +154,7 @@ const RecallGuardTerms = () => {
           subscription or trial.
         </Paragraph>
         <Paragraph className="mb-3">
-          <Term>Subscription price</Term>: $49.99 USD per year (subject to
+          <Term>Subscription price</Term>: $50.00 USD per year (subject to
           change, with notice). Includes the full app &mdash; personalized
           recall feed by state, food category, and brand; persistent pantry via
           barcode scanning, receipt photo capture, or manual entry; push
@@ -330,7 +330,7 @@ const RecallGuardTerms = () => {
         </Bullets>
         <Paragraph className="mb-3">
           Our total aggregate liability for any claim related to the App shall
-          not exceed the greater of (a) $49.99 USD or (b) the amount you paid us
+          not exceed the greater of (a) $50.00 USD or (b) the amount you paid us
           in subscription fees in the 12 months preceding the claim.
         </Paragraph>
         <Paragraph>
