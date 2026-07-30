@@ -4,27 +4,35 @@ import products from "../data/products.json";
 import kitchenPhoto from "../assets/images/recallguard-kitchen.jpg";
 import feedScreenshot from "../assets/images/recallguard-feed.webp";
 import { usePageEntrance } from "../lib/usePageEntrance";
-import { Section, Paragraph, List, FaqItem } from "../components/ui";
+import {
+  Section,
+  Paragraph,
+  List,
+  FaqItem,
+  WaitlistForm,
+} from "../components/ui";
 import { STUDIO_NAME } from "../lib/site";
 
 const product = products.find((p) => p.slug === "recallguard");
 
+// One line each. The detail these used to carry lives in the FAQ, where a
+// reader who wants it goes looking — a feature grid is for scanning.
 const FEATURES = [
   {
     title: "Your allergens, alerted first",
-    body: "Pick the allergens your household reacts to: milk, peanut, tree nut, sesame, any of the FDA's nine. Every recall gets filtered against that list, and when one names an allergen you track, the push notification leads with the allergen, not the brand.",
+    body: "The alert leads with the allergen you track, not the brand.",
   },
   {
     title: "Your pantry, matched automatically",
-    body: "Add what you've bought by typing it, scanning the barcode, or photographing the receipt. When a recall hits one of those products, the alert says your item is recalled, not that you should go check.",
+    body: "Scan a barcode or a receipt. We tell you your item is recalled.",
   },
   {
     title: "Pet food, as the FDA publishes it",
-    body: "Pet food recalls get far less coverage than human food recalls and rarely reach the news. RecallGuard reads the FDA's animal-food feed and flags the recalls that touch a species in your household.",
+    body: "The animal-food feed almost nobody else watches.",
   },
   {
     title: "Your whole household, not just you",
-    body: "Link up to four households so an alert reaches whoever actually opens the fridge. One person adds the groceries; everyone who eats them gets told.",
+    body: "Link up to four people, so the alert reaches whoever opens the fridge.",
   },
 ];
 
@@ -54,9 +62,25 @@ const FAQS = [
       "Two public government sources: the FDA, which covers most human food and animal food, and USDA FSIS, which covers meat, poultry, and egg products. RecallGuard reads both feeds on a schedule, extracts the product identifiers, and matches them against your profile and pantry. It does not republish, alter, or editorialize either agency's findings.",
   },
   {
+    // Merged from the old pricing-section paragraph and the old "is there a
+    // free tier" answer, which said the same thing twice.
     question: "Is there a free tier?",
     answer:
-      "No. There is a 14-day free trial, and after that it's a paid subscription. A free tier would mean funding the app some other way, and the other ways all involve your data or your attention. The FDA also publishes a free recall email list at fda.gov if that suits you better.",
+      "No. There is a 14-day free trial, and after that it's a paid subscription. The money pays for FDA and USDA ingestion, the matching engine, receipt parsing, and Apple's cut. There is no free tier because the honest versions of \"free\" all involve selling something that isn't ours to sell.",
+  },
+  {
+    // Moved out of the pricing section verbatim. It belongs on the page, but
+    // not shoulder to shoulder with the price.
+    question: "Is there a free alternative?",
+    answer:
+      "Yes, and we'd rather say so. The FDA publishes a free recall email list at fda.gov. It's unfiltered and it's slower, but it's real and it's free, and we'd rather tell you that than take your money under false pretenses.",
+  },
+  {
+    // Carries the allergen and household detail cut from the feature grid.
+    // Deliberately stops short of the pantry question below it.
+    question: "What does it match against?",
+    answer:
+      "Your allergen list (any of the FDA's nine: milk, peanut, tree nut, sesame and the rest), your state, the species in your household, and anything you've added to your pantry. Pet food is included, which matters because animal-food recalls get far less coverage than human food and rarely reach the news.",
   },
   {
     question: "How does receipt scanning work?",
@@ -118,16 +142,12 @@ const RecallGuard = () => {
                 Download on the App Store
               </a>
             ) : (
-              <div className="flex flex-wrap items-center gap-4">
-                <span className="inline-flex cursor-default items-center gap-2 rounded-full border border-line bg-paper-sunk px-6 py-3 text-sm font-medium text-graphite/70">
-                  Coming to the App Store
-                </span>
-                <Link
-                  to="/recallguard/support"
-                  className="text-sm text-ink underline decoration-line underline-offset-4 transition-colors duration-300 ease-ink hover:decoration-ink"
-                >
-                  Questions?
-                </Link>
+              /* Pre-launch there is no App Store link to send anyone to, so
+                 the form is the page's only real action. The conditional
+                 stays: the day appStoreUrl lands in products.json, the
+                 download button takes over and the form disappears. */
+              <div className="max-w-md">
+                <WaitlistForm id="hero" />
               </div>
             )}
 
@@ -135,23 +155,32 @@ const RecallGuard = () => {
                 superseding the earlier $49.99. Keep this, the Terms, and the
                 App Store Connect IAP price identical — they are the same
                 promise made in three places. */}
-            <p className="mt-4 text-sm text-graphite/70">
-              $50 per year after a 14-day free trial. Cancel anytime in iOS
-              Settings.
-            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-graphite/70">
+              <p>
+                $50 per year after a 14-day free trial. Cancel anytime in iOS
+                Settings.
+              </p>
+              <Link
+                to="/recallguard/support"
+                className="text-ink underline decoration-line underline-offset-4 transition-colors duration-300 ease-ink hover:decoration-ink"
+              >
+                Questions?
+              </Link>
+            </div>
           </div>
 
-          {/* Editorial photo, not a product shot. Per assets/editorial/CREDITS.md
-              these run as atmosphere behind type — never as the thing claiming
-              to be a recalled product. Pexels license, free commercial, no
-              attribution required. No faces, no legible brands. */}
+          {/* The product, in the first screen. This used to be the editorial
+              kitchen photo (now moved down to Why) on the rule that these
+              photos are atmosphere and never product shots. That rule still
+              holds for the photography; it just shouldn't cost the hero the
+              only image that shows what someone is signing up for. */}
           <img
-            src={kitchenPhoto}
-            alt="A carton of eggs on a floured wooden counter beside a whisk"
-            width="778"
-            height="1100"
+            src={feedScreenshot}
+            alt="RecallGuard's recall feed, showing FDA and USDA recalls with severity labels"
+            width="660"
+            height="1127"
             loading="eager"
-            className="mx-auto aspect-[4/5] w-full max-w-sm rounded-2xl object-cover"
+            className="mx-auto w-full max-w-[300px] rounded-[1.75rem] border border-line shadow-sm"
           />
         </div>
       </section>
@@ -173,17 +202,17 @@ const RecallGuard = () => {
               belongs.
             </Paragraph>
           </div>
-          {/* Real capture from the build in progress, not a mockup. Cropped to
-              the feed itself: the protection header above it reads "0 items
-              watched" on a fresh account, which argues against the product.
-              Re-shoot with a populated pantry once the app is polished. */}
+          {/* Editorial photo, not a product shot. Per assets/editorial/CREDITS.md
+              these run as atmosphere behind type — never as the thing claiming
+              to be a recalled product. Pexels license, free commercial, no
+              attribution required. No faces, no legible brands. */}
           <img
-            src={feedScreenshot}
-            alt="RecallGuard's recall feed, showing FDA and USDA recalls with severity labels"
-            width="660"
-            height="1127"
+            src={kitchenPhoto}
+            alt="A carton of eggs on a floured wooden counter beside a whisk"
+            width="778"
+            height="1100"
             loading="lazy"
-            className="mx-auto w-full max-w-[300px] rounded-[1.75rem] border border-line shadow-sm"
+            className="mx-auto aspect-[4/5] w-full max-w-sm rounded-2xl object-cover"
           />
         </div>
       </Section>
@@ -216,11 +245,11 @@ const RecallGuard = () => {
             What's covered
           </h3>
           <Paragraph className="mb-4">
-            Two agencies, because food safety is split between them. The FDA
-            covers most human food plus animal food. USDA FSIS covers meat,
-            poultry, and egg products. RecallGuard reads both, so a beef recall
-            and a cookie recall reach you the same way.
+            FDA and USDA FSIS both, so a beef recall and a cookie recall reach
+            you the same way.
           </Paragraph>
+          {/* Keep this one verbatim. It limits the promise, and a limit is
+              worth more words than a benefit. */}
           <Paragraph>
             Alerts land the same day the agency posts the recall, not the
             instant it happens. We poll the feeds on a schedule rather than
@@ -232,9 +261,8 @@ const RecallGuard = () => {
       {/* Alert behavior */}
       <Section eyebrow="Alerts" title="How notifications behave">
         <Paragraph className="mb-8 max-w-prose">
-          The FDA classifies every recall by how much harm it could cause.
-          RecallGuard delivers each class differently, so a labeling technicality
-          never wakes you up and a genuine hazard never gets buried.
+          A labeling technicality never wakes you up. A genuine hazard never
+          gets buried.
         </Paragraph>
 
         <div className="overflow-x-auto">
@@ -291,19 +319,11 @@ const RecallGuard = () => {
             />
           </div>
 
+          {/* The two argument paragraphs that used to sit here (why no free
+              tier, and the FDA's free email list) moved into the FAQ. Both
+              still appear on the page in full; they just no longer make the
+              case against buying while the reader is looking at the price. */}
           <div className="space-y-5">
-            <Paragraph>
-              The subscription pays for FDA and USDA ingestion, the matching
-              engine, receipt parsing, and Apple's cut. There is no free tier
-              because the honest versions of "free" all involve selling
-              something that isn't ours to sell.
-            </Paragraph>
-            <Paragraph>
-              If that math doesn't work for you, the FDA publishes a free recall
-              email list at fda.gov. It's unfiltered and it's slower, but it's
-              real and it's free, and we'd rather tell you that than take your
-              money under false pretenses.
-            </Paragraph>
             <Paragraph>
               Billing is handled by Apple. Cancel anytime from iOS Settings.
             </Paragraph>
@@ -344,6 +364,23 @@ const RecallGuard = () => {
           </Link>
         </div>
       </Section>
+
+      {/* Closing CTA — the action exists at both ends of the scroll, since a
+          reader who went through the FAQ shouldn't have to travel back up. */}
+      {!product.appStoreUrl && (
+        <Section className="pt-0">
+          <div className="rounded-2xl border border-line bg-rg-wash px-6 py-12 text-center sm:px-12">
+            <h2 className="mb-3 font-Fraunces text-2xl font-normal text-ink sm:text-3xl">
+              Know before you eat it
+            </h2>
+            <p className="mx-auto mb-8 max-w-prose text-graphite">
+              RecallGuard launches on iPhone soon. Leave your email and we'll
+              tell you the day it's live.
+            </p>
+            <WaitlistForm id="footer" className="mx-auto max-w-md text-left" />
+          </div>
+        </Section>
+      )}
     </div>
   );
 };

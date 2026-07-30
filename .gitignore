@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Real credentials. .env.example is the tracked template and holds no secrets.
+.env
+.env.*
+!.env.example
+
 # Claude Code local files
 .claude/skills/
 !.claude/settings.local.json
