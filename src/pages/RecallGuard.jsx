@@ -136,10 +136,18 @@ const RecallGuard = () => {
               The recall happens after the food is in your kitchen.
             </h1>
 
-            <p className="mb-8 max-w-prose text-lede text-graphite">
+            {/* "household" on purpose. The old version enumerated allergens,
+                pets, and pantry, which are three different match types (an
+                attribute of a recall, a product category, a specific item you
+                own) and read as a list of target segments. They are all food
+                in your home, and the features grid below already spells out
+                the specifics, so the hero states the general promise. */}
+            {/* text-pretty, not text-balance: this is body copy, and balance
+                would even out the line lengths where all we want is to stop
+                "household." from orphaning onto a line by itself. */}
+            <p className="mb-8 max-w-prose text-pretty text-lede text-graphite">
               RecallGuard watches FDA and USDA food recalls and tells you the
-              same day one names an allergen you track, a species in your
-              household, or a product in your pantry.
+              same day one affects your household.
             </p>
 
             {product.appStoreUrl ? (
