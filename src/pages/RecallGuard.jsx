@@ -122,8 +122,18 @@ const RecallGuard = () => {
               </p>
             </div>
 
-            <h1 className="mb-6 font-Fraunces text-display-sm font-normal text-ink">
-              Undeclared peanut. Never again caught off guard.
+            {/* "Undeclared peanut" was FDA's own recall wording, but it reads
+                as jargon and the fragment never parses as a sentence. This
+                leads with the situation instead, and covers listeria, foreign
+                material, and pet food rather than allergens alone. Canonical
+                copy lives in the vault at
+                Projects/RecallGuard/landing-page-copy.md. */}
+            {/* text-balance rather than a hard <br>: at this measure the
+                headline otherwise orphans "kitchen." onto a third line, and a
+                manual break would land in the wrong place once the fluid type
+                scale shrinks on narrow screens. */}
+            <h1 className="mb-6 text-balance font-Fraunces text-display-sm font-normal text-ink">
+              The recall happens after the food is in your kitchen.
             </h1>
 
             <p className="mb-8 max-w-prose text-lede text-graphite">
