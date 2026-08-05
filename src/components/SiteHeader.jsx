@@ -7,8 +7,8 @@ const navLinkClass = ({ isActive }) =>
   }`;
 
 export const SiteHeader = () => (
-  <header className="rule-bottom sticky top-0 z-20 bg-paper/85 backdrop-blur-sm">
-    <div className="mx-auto flex max-w-content items-center justify-between gap-6 px-gutter py-5">
+  <header className="rule-bottom sticky top-0 z-20 bg-paper/85 px-gutter backdrop-blur-sm">
+    <div className="mx-auto flex max-w-content items-center justify-between gap-6 py-5">
       <Link
         to="/"
         className="font-Fraunces text-lg font-medium tracking-tight text-ink transition-opacity duration-300 ease-ink hover:opacity-70"
