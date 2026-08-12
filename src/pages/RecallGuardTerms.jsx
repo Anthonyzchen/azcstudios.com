@@ -154,7 +154,7 @@ const RecallGuardTerms = () => {
           subscription or trial.
         </Paragraph>
         <Paragraph className="mb-3">
-          <Term>Subscription price</Term>: $50.00 USD per year (subject to
+          <Term>Subscription price</Term>: $48.00 USD per year (subject to
           change, with notice). Includes the full app &mdash; personalized
           recall feed by state, food category, and brand; persistent pantry via
           barcode scanning, receipt photo capture, or manual entry; push
@@ -328,6 +328,11 @@ const RecallGuardTerms = () => {
           <li>Loss of data, loss of profits, or loss of goodwill.</li>
           <li>Errors or inaccuracies in FDA recall data.</li>
         </Bullets>
+        {/* The $50.00 here is deliberately NOT tracking the subscription price
+            down to $48.00. This is a floor on what a user can recover, not a
+            representation of what we charge — "the greater of" means lowering it
+            would only ever shrink their remedy, for no benefit to us. Leave it
+            unless a lawyer says otherwise. */}
         <Paragraph className="mb-3">
           Our total aggregate liability for any claim related to the App shall
           not exceed the greater of (a) $50.00 USD or (b) the amount you paid us

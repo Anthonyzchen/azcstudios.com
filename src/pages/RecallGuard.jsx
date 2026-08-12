@@ -62,18 +62,25 @@ const FAQS = [
       "Two public government sources: the FDA, which covers most human food and animal food, and USDA FSIS, which covers meat, poultry, and egg products. RecallGuard reads both feeds on a schedule, extracts the product identifiers, and matches them against your profile and pantry. It does not republish, alter, or editorialize either agency's findings.",
   },
   {
-    // Merged from the old pricing-section paragraph and the old "is there a
-    // free tier" answer, which said the same thing twice.
-    question: "Is there a free tier?",
+    // Answers the objection without itemising costs. An earlier version broke
+    // down where the money goes (ingestion, matching, Apple's cut), which reads
+    // as a plea rather than a price: it argues we need the money instead of
+    // what the buyer gets for it. State the work, not the margins.
+    //
+    // A second FAQ here used to name the FDA's free email list outright.
+    // Removed 2026-08-12 (Anthony): no obligation to hand a prospect the exit
+    // mid-decision. Anyone determined to find a free option will find one, and
+    // they can compare it to this on their own. Do not reinstate without asking.
+    //
+    // The question was "Is there a free tier?" until 2026-08-12. That headline
+    // asks the reader's cheapest question for them and frames free as the
+    // default we're withholding. Asking what the money buys gets the same
+    // information across — the no-free-tier answer is still the first sentence,
+    // which is what keeps a surprised installer from leaving a bait-and-switch
+    // review — without leading with the absence.
+    question: "What does the subscription cover?",
     answer:
-      "No. There is a 14-day free trial, and after that it's a paid subscription. The money pays for FDA and USDA ingestion, the matching engine, receipt parsing, and Apple's cut. There is no free tier because the honest versions of \"free\" all involve selling something that isn't ours to sell.",
-  },
-  {
-    // Moved out of the pricing section verbatim. It belongs on the page, but
-    // not shoulder to shoulder with the price.
-    question: "Is there a free alternative?",
-    answer:
-      "Yes, and we'd rather say so. The FDA publishes a free recall email list at fda.gov. It's unfiltered and it's slower, but it's real and it's free, and we'd rather tell you that than take your money under false pretenses.",
+      "There is a 14-day free trial, then it's $4.00 a month billed annually, with no free tier after that. You're paying for the work: three government feeds pulled on a schedule, cleaned into a consistent shape, and checked against what's actually in your kitchen. The alternative is doing that yourself, every week, forever.",
   },
   {
     // Carries the allergen and household detail cut from the feature grid.
@@ -169,14 +176,26 @@ const RecallGuard = () => {
               </div>
             )}
 
-            {/* $50/yr is the confirmed launch price (Anthony, 2026-07-29),
-                superseding the earlier $49.99. Keep this, the Terms, and the
-                App Store Connect IAP price identical — they are the same
-                promise made in three places. */}
+            {/* $48/yr is the confirmed launch price (Anthony, 2026-08-12),
+                superseding $50 and, before that, $49.99. Keep this, the Terms,
+                and the App Store Connect IAP price identical — they are the
+                same promise made in three places.
+
+                $4.00/mo is that same $48 divided by 12, which is why the annual
+                is $48 and not $50: the monthly is the number people read first,
+                so it is the one that has to be clean. It is only sayable while
+                "billed annually" and the annual total sit beside it in the same
+                sentence at the same size — see the pricing rule in
+                recall-guard/marketing/claims.md. A monthly figure with the term
+                demoted to fine print is the FTC Negative Option problem, not a
+                punchier headline. If the price ever moves, re-derive this by
+                hand; the app derives its own from StoreKit and will not need
+                editing. Write "$4.00", never "$4" — the trailing zeros are the
+                round-number quality signal doing its job. */}
             <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-graphite/70">
               <p>
-                $50 per year after a 14-day free trial. Cancel anytime in iOS
-                Settings.
+                $4.00/mo, billed annually ($48/year), after a 14-day free trial.
+                Cancel anytime in iOS Settings.
               </p>
               <Link
                 to="/recallguard/support"
@@ -320,9 +339,15 @@ const RecallGuard = () => {
       <Section eyebrow="Pricing" title="One subscription, no free tier">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-16">
           <div className="rounded-2xl border border-line bg-white/60 p-8">
-            <p className="mb-2 font-Fraunces text-4xl text-ink">$50</p>
-            <p className="mb-6 text-sm text-graphite/70">
-              per year, after a 14-day free trial
+            {/* The billing-term line is deliberately full-strength `text-graphite`
+                rather than the `graphite/70` used for supporting copy elsewhere on
+                this page. Fading it is what turns a monthly-first price into the
+                pattern this framing is careful not to be: the anchor may be the
+                big number, but the term and the annual total have to read as
+                first-class text, not as a disclaimer. Don't "tidy" this to /70. */}
+            <p className="mb-1 font-Fraunces text-4xl text-ink">$4.00/mo</p>
+            <p className="mb-6 text-sm text-graphite">
+              Billed annually at $48/year, after a 14-day free trial
             </p>
             <List
               items={[
@@ -337,10 +362,11 @@ const RecallGuard = () => {
             />
           </div>
 
-          {/* The two argument paragraphs that used to sit here (why no free
-              tier, and the FDA's free email list) moved into the FAQ. Both
-              still appear on the page in full; they just no longer make the
-              case against buying while the reader is looking at the price. */}
+          {/* Two argument paragraphs used to sit here: why there's no free tier,
+              and a pointer to the FDA's free email list. The first moved to the
+              FAQ so it isn't making its case while the reader is looking at the
+              price. The second was cut entirely on 2026-08-12. Keep this space
+              for what the subscription buys, never for what it costs us. */}
           <div className="space-y-5">
             <Paragraph>
               Billing is handled by Apple. Cancel anytime from iOS Settings.
