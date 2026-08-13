@@ -328,14 +328,17 @@ const RecallGuardTerms = () => {
           <li>Loss of data, loss of profits, or loss of goodwill.</li>
           <li>Errors or inaccuracies in FDA recall data.</li>
         </Bullets>
-        {/* The $50.00 here is deliberately NOT tracking the subscription price
-            down to $48.00. This is a floor on what a user can recover, not a
-            representation of what we charge — "the greater of" means lowering it
-            would only ever shrink their remedy, for no benefit to us. Leave it
-            unless a lawyer says otherwise. */}
+        {/* $48.00 tracks the annual subscription price on purpose (Anthony,
+            2026-08-12), so the cap is exactly one year of fees: for an annual
+            subscriber both branches of "the greater of" evaluate to $48, and the
+            floor only does work for someone who paid less (partial period,
+            refund). Keep "greater of" — it is the consumer-favourable direction,
+            and inverting it to "lesser of" is a materially different clause.
+            If the price moves, this moves with it. Attorney review outstanding
+            on whether a fixed floor is the right shape at all. */}
         <Paragraph className="mb-3">
           Our total aggregate liability for any claim related to the App shall
-          not exceed the greater of (a) $50.00 USD or (b) the amount you paid us
+          not exceed the greater of (a) $48.00 USD or (b) the amount you paid us
           in subscription fees in the 12 months preceding the claim.
         </Paragraph>
         <Paragraph>
