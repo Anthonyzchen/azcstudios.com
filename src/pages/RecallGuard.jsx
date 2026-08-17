@@ -8,6 +8,7 @@ import {
   Section,
   Paragraph,
   List,
+  Stat,
   FaqItem,
   WaitlistForm,
 } from "../components/ui";
@@ -34,6 +35,49 @@ const FEATURES = [
     title: "Your whole household, not just you",
     body: "Link up to four people, so the alert reaches whoever opens the fridge.",
   },
+];
+
+// Every figure here is logged in recall-guard/marketing/facts.md with its
+// source and last-verified date, re-confirmed against source 2026-08-14. Do not
+// add a number to this page that isn't in that ledger, and don't round one that
+// is.
+//
+// The framing is load-bearing and easy to "improve" into something false: recall
+// COUNTS were essentially flat (296 → 320) and outbreak-associated illnesses
+// actually FELL (1,804 → 1,003). What rose is the volume of food per recall and
+// the severity of the outcomes. "Recalls are surging" is the obvious headline
+// and it does not survive a fact-check, so this section never says it.
+const TREND_STATS = [
+  {
+    from: "45.0M",
+    to: "109.7M",
+    label: "FDA units of food pulled from shelves",
+    period: "First three quarters, 2024 to 2025",
+  },
+  {
+    from: "7.9M",
+    to: "60M",
+    label: "Pounds of meat and poultry recalled by the USDA",
+    period: "First three quarters, 2024 to 2025",
+  },
+  {
+    // Different year range from the two above, which is exactly why every stat
+    // carries its own period line rather than one shared caption.
+    from: "~240",
+    to: "500+",
+    label: "People hospitalized or killed by contaminated food",
+    period: "2023 to 2024",
+  },
+];
+
+// The toll is quoted from the CDC's final case count, not from the interim
+// numbers that circulated while the outbreak was open (an earlier report had
+// six deaths and 18 states).
+const OUTBREAK_TOLL = [
+  { figure: "19", label: "states" },
+  { figure: "27", label: "hospitalized" },
+  { figure: "7", label: "dead" },
+  { figure: "One", label: "pregnancy lost" },
 ];
 
 const SEVERITY_TIERS = [
@@ -101,8 +145,7 @@ const FAQS = [
   },
   {
     question: "Which platforms are supported?",
-    answer:
-      "iPhone at launch. There is no committed Android date.",
+    answer: "iPhone at launch. There is no committed Android date.",
   },
 ];
 
@@ -222,8 +265,204 @@ const RecallGuard = () => {
         </div>
       </section>
 
-      {/* Why it exists */}
-      <Section eyebrow="Why" title="Most recall apps tell everyone everything">
+      {/* The problem, in numbers. This and the case study below have to be
+          direct children of the entrance ref — usePageEntrance staggers the
+          container's immediate children only, so a section nested one level
+          deeper would pop in with no animation while its neighbours fade up. */}
+      <Section
+        eyebrow="Why it matters"
+        title="Recalls didn't get more common. They got bigger."
+      >
+        <Paragraph className="mb-10 max-w-prose">
+          The count barely moved: 296 food recalls in 2024, 320 in 2025. What
+          changed is how much food each one covers, and how badly they end.
+        </Paragraph>
+
+        <div className="grid gap-x-12 gap-y-10 sm:grid-cols-3">
+          {TREND_STATS.map((stat) => (
+            <Stat
+              key={stat.label}
+              from={stat.from}
+              to={stat.to}
+              label={stat.label}
+              period={stat.period}
+            />
+          ))}
+        </div>
+
+        {/* Same card treatment as "What's covered" further down the page, so the
+            two read as the same kind of aside rather than two inventions. */}
+        <div className="mt-12 rounded-2xl border border-line bg-paper-sunk p-6 sm:p-8">
+          <div className="grid gap-6 sm:grid-cols-[auto_1fr] sm:items-start sm:gap-10">
+            {/* aria-hidden because the sentence beside it already says "60
+                percent" — without this a screen reader reads the figure twice.
+                The number here is typographic emphasis, not the only carrier of
+                the fact. */}
+            <p
+              aria-hidden="true"
+              className="font-Fraunces text-4xl text-ink sm:text-5xl"
+            >
+              60%
+            </p>
+            <div className="space-y-4">
+              <Paragraph>
+                Of the FDA's foodborne illness investigations in 2025, 60
+                percent closed without a product ever being named.
+              </Paragraph>
+              <Paragraph>
+                No named product means no recall, which means there is nothing
+                for you to check your kitchen against. The recalls that do get
+                named are the ones you can still act on, and most people never
+                hear about those either.
+              </Paragraph>
+            </div>
+          </div>
+        </div>
+
+        {/* graphite/80 rather than the /60 used for eyebrows. These lines are
+            what substantiate every figure above them, so they have to clear AA
+            contrast — fine print is still print. */}
+        <p className="mt-8 text-xs leading-relaxed text-graphite/80">
+          Sources: US PIRG Education Fund, Food for Thought 2025 and 2026;
+          Sedgwick Recall Index, Q3 2025.
+        </p>
+      </Section>
+
+      {/* The case study. pt-0 keeps it reading as the second half of the section
+          above rather than a fresh topic, the same way the closing CTA hangs off
+          the FAQ.
+
+          THIS BLOCK ARGUES ONE THING AND MUST KEEP ARGUING IT: illnesses kept
+          coming in AFTER the recall was public. That is the gap RecallGuard
+          closes. An earlier draft led on "ten months between the first illness
+          and the first recall," which is true but is the FDA's investigation
+          lag, not ours to fix — it promised the reader something the product
+          does not do. Do not restore that framing.
+
+          ACCURACY GUARDRAILS, all three load-bearing:
+          1. Do NOT say the product sat on shelves for months, or that the 11
+             later victims ate the recalled item in defiance of the notice. The
+             sources support the case curve, not either of those.
+          2. The scope widened over time — Nate's Fine Foods expanded the
+             pre-cooked pasta recall on 2025-09-30 and CDC widened the alert to
+             more prepared foods — so some later cases involve products the June
+             notice did not yet name. The claim on this page is only that the
+             count kept climbing while a public notice existed.
+          3. November 16, 2025 is CDC's last SAMPLE COLLECTION date, five months
+             past the recall and well beyond listeria's ~70-day incubation, so
+             the late cases are genuinely post-recall. Say "still getting sick,"
+             never a specific onset date we don't have. */}
+      <Section className="pt-0">
+        <div className="rounded-2xl border border-line px-6 py-10 sm:px-10 sm:py-12">
+          <p className="mb-5 font-Inter text-eyebrow uppercase text-graphite/60">
+            After the notice
+          </p>
+          <h2 className="mb-6 max-w-prose text-balance font-Fraunces text-2xl font-normal leading-tight text-ink sm:text-3xl">
+            The recall published in June 2025. People were still getting sick in
+            November.
+          </h2>
+          <Paragraph className="mb-10 max-w-prose">
+            Listeria in pre-cooked pasta, sold as prepared chicken fettuccine
+            alfredo at Walmart and Kroger. Seventeen people had been identified
+            when the recall went out. The count did not stop there.
+          </Paragraph>
+
+          <div className="mb-10 max-w-sm">
+            <Stat
+              from="17"
+              to="28"
+              label="People infected, while a public recall notice existed the entire time"
+              period="At the June 2025 recall, to the final count"
+            />
+          </div>
+
+          {/* flex-col-reverse, not an sr-only term: the label is the <dt> and
+              the figure is the <dd>, which is the pairing a screen reader wants
+              ("dead, 7"), while the reversed column still paints the number
+              above its label. Hiding a duplicate <dt> instead would announce
+              every label twice. */}
+          <dl className="rule-top flex flex-wrap gap-x-12 gap-y-6 pt-8">
+            {OUTBREAK_TOLL.map((item) => (
+              <div key={item.label} className="flex flex-col-reverse">
+                <dt className="mt-1 text-[0.95rem] text-graphite">
+                  {item.label}
+                </dt>
+                <dd className="font-Fraunces text-3xl text-ink">
+                  {item.figure}
+                </dd>
+              </div>
+            ))}
+          </dl>
+
+          {/* The thesis of the whole page, and the one sentence that has to
+              survive any future edit. */}
+          <Paragraph className="mt-10 max-w-prose">
+            The notice was public that entire time. It was posted to a
+            government feed, picked up for a day, and never reached the people
+            with the food already in their refrigerator. Published is not the
+            same as told.
+          </Paragraph>
+
+          <p className="mt-6 text-xs leading-relaxed text-graphite/80">
+            CDC, case counts as of June 18, 2025 and at the final update;
+            outbreak declared over February 2026.
+          </p>
+        </div>
+      </Section>
+
+      {/* The bridge, and the load-bearing one. The case study leaves the reader
+          asking "how is that even possible?" — this answers it, and turns the
+          outbreak from one company's failure into a structural inevitability,
+          which is the version that justifies paying someone to watch the feed.
+
+          Deliberately plain type at prose width, no card. It sits between two
+          bordered blocks (the 60% aside and the case study) and needs to read
+          as the page's own voice making a turn, not as a third exhibit.
+
+          Both claims are regulatory, so both were confirmed against two
+          independent trade writeups of the PIRG report rather than one:
+          Food Safety News 2026-04-16 ("No one has to contact grocery stores or
+          restaurants. No one has to notify consumers") and Food Safety Magazine
+          on the same report. The FDA line is the agency's own wording, from a
+          statement to PIRG dated 2025-01-07. Do not paraphrase the quote into
+          something stronger than "not all" — it is a limit, not an admission
+          that most recalls go unpublished. */}
+      <Section
+        eyebrow="Why nobody called"
+        title="No rule says they have to"
+        width="prose"
+      >
+        <div className="space-y-5">
+          <Paragraph>
+            A recall works like this. The company tells the regulator and puts
+            out a press release. From there, nothing in the system requires
+            anyone to contact the stores that sold the product, or the people
+            who carried it home.
+          </Paragraph>
+          <Paragraph>
+            Not every recall even gets that far. The FDA posts the ones it
+            judges serious enough, and says plainly that not all recalls have
+            press releases or are posted on its page.
+          </Paragraph>
+          <Paragraph>
+            So the notice sits in a federal feed, correct and public and unread.
+            Someone has to go and get it, and check it against your kitchen.
+          </Paragraph>
+        </div>
+
+        <p className="mt-8 text-xs leading-relaxed text-graphite/80">
+          US PIRG Education Fund, Food for Thought 2026; FDA statement, January
+          2025.
+        </p>
+      </Section>
+
+      {/* Why it exists. Eyebrow is "Why RecallGuard", not "Why" — the section
+          above already answers why the problem is worth solving, and two
+          adjacent sections both labelled "Why" read as an editing slip. */}
+      <Section
+        eyebrow="Why RecallGuard"
+        title="Most recall apps tell everyone everything"
+      >
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
           <div className="space-y-5">
             <Paragraph>
@@ -233,10 +472,10 @@ const RecallGuard = () => {
               screens down.
             </Paragraph>
             <Paragraph>
-              RecallGuard inverts it. You say what matters (your allergens, your pets, what you actually buy) and the app filters the FDA's
-              stream down to the recalls that could plausibly reach your
-              kitchen. Everything else stays in the feed, unread, where it
-              belongs.
+              RecallGuard inverts it. You say what matters (your allergens, your
+              pets, what you actually buy) and the app filters the FDA's stream
+              down to the recalls that could plausibly reach your kitchen.
+              Everything else stays in the feed, unread, where it belongs.
             </Paragraph>
           </div>
           {/* Editorial photo, not a product shot. Per assets/editorial/CREDITS.md
@@ -261,10 +500,7 @@ const RecallGuard = () => {
         <div className="grid gap-x-12 gap-y-10 sm:grid-cols-2">
           {FEATURES.map((feature) => (
             <div key={feature.title}>
-              <div
-                className="mb-5 h-px w-10 bg-rg"
-                aria-hidden="true"
-              />
+              <div className="mb-5 h-px w-10 bg-rg" aria-hidden="true" />
               <h3 className="mb-3 font-Fraunces text-lg text-ink">
                 {feature.title}
               </h3>
