@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import products from "../data/products.json";
-import kitchenPhoto from "../assets/images/recallguard-kitchen.jpg";
+import allergenPhoto from "../assets/images/recallguard-allergens.jpg";
 import feedScreenshot from "../assets/images/recallguard-feed.webp";
 import { usePageEntrance } from "../lib/usePageEntrance";
 import {
@@ -78,6 +78,32 @@ const OUTBREAK_TOLL = [
   { figure: "27", label: "hospitalized" },
   { figure: "7", label: "dead" },
   { figure: "One", label: "pregnancy lost" },
+];
+
+// The notification chain, drawn rather than described. The argument in this
+// section is that a recall is a relay which simply stops before it reaches the
+// person holding the food, and a reader shouldn't have to assemble that from
+// three paragraphs when one picture states it.
+//
+// Split into two groups on purpose: the break between them IS the point. Solid
+// borders for the legally required handoffs, dashed for the ones no rule
+// compels. Note the "absent" state is signalled by border STYLE, never by
+// fading the text — a ghosted label would fail contrast, and these labels are
+// the half of the diagram that matters most.
+//
+// Labels stay short and uniform. The FDA "not every recall gets published"
+// caveat used to live inside the third node, which made that box twice the
+// height of its neighbours and broke the read of three equal steps. It sits
+// under the row now, where it qualifies the step without deforming the chain.
+const CHAIN_REQUIRED = [
+  { label: "The company finds the problem" },
+  { label: "It tells the FDA or USDA" },
+  { label: "A notice is published" },
+];
+
+const CHAIN_ABSENT = [
+  { label: "The store that sold it" },
+  { label: "The person who bought it" },
 ];
 
 const SEVERITY_TIERS = [
@@ -432,23 +458,90 @@ const RecallGuard = () => {
         title="No rule says they have to"
         width="prose"
       >
-        <div className="space-y-5">
-          <Paragraph>
-            A recall works like this. The company tells the regulator and puts
-            out a press release. From there, nothing in the system requires
-            anyone to contact the stores that sold the product, or the people
-            who carried it home.
-          </Paragraph>
-          <Paragraph>
-            Not every recall even gets that far. The FDA posts the ones it
-            judges serious enough, and says plainly that not all recalls have
-            press releases or are posted on its page.
-          </Paragraph>
-          <Paragraph>
+        <Paragraph className="mb-10">
+          A recall is a relay. Here is every handoff it is actually obliged to
+          make.
+        </Paragraph>
+
+        {/* Arrows are decorative and hidden from assistive tech; the ordered
+            lists carry the sequence on their own, and the two group headings
+            say which half is required. A screen reader gets "What the rules
+            require: 1, 2, 3. What nothing requires: 1, 2." */}
+        <figure className="m-0">
+          <p className="mb-4 font-Inter text-xs uppercase tracking-[0.16em] text-graphite/80">
+            What the rules require
+          </p>
+          <ol className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+            {CHAIN_REQUIRED.map((step, i) => (
+              <li
+                key={step.label}
+                className="flex items-stretch gap-3 sm:flex-1"
+              >
+                {i > 0 && (
+                  <span
+                    aria-hidden="true"
+                    className="rotate-90 self-center text-graphite/60 sm:rotate-0"
+                  >
+                    &rarr;
+                  </span>
+                )}
+                <div className="flex flex-1 items-center rounded-xl border border-line bg-paper-sunk px-4 py-3 text-[0.9rem] leading-snug text-ink">
+                  {step.label}
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <p className="mt-4 text-xs leading-relaxed text-graphite">
+            And only the ones judged serious enough. The FDA says plainly that
+            not all recalls get a press release or a page.
+          </p>
+
+          {/* The break. This is the whole diagram — everything above it is
+              setup for the fact that the relay ends here. */}
+          <div className="my-8 flex items-center gap-4">
+            <span
+              aria-hidden="true"
+              className="h-0 flex-1 border-t border-dashed border-graphite/40"
+            />
+            <p className="font-Inter text-xs uppercase tracking-[0.16em] text-ink">
+              And there it stops
+            </p>
+            <span
+              aria-hidden="true"
+              className="h-0 flex-1 border-t border-dashed border-graphite/40"
+            />
+          </div>
+
+          <p className="mb-4 font-Inter text-xs uppercase tracking-[0.16em] text-graphite/80">
+            What nothing requires
+          </p>
+          <ol className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+            {CHAIN_ABSENT.map((step, i) => (
+              <li
+                key={step.label}
+                className="flex items-stretch gap-3 sm:flex-1"
+              >
+                {i > 0 && (
+                  <span
+                    aria-hidden="true"
+                    className="rotate-90 self-center text-graphite/40 sm:rotate-0"
+                  >
+                    &rarr;
+                  </span>
+                )}
+                <div className="flex flex-1 items-center rounded-xl border border-dashed border-graphite/40 px-4 py-3 text-[0.9rem] leading-snug text-ink">
+                  {step.label}
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <figcaption className="mt-8 text-[0.95rem] leading-relaxed text-graphite">
             So the notice sits in a federal feed, correct and public and unread.
             Someone has to go and get it, and check it against your kitchen.
-          </Paragraph>
-        </div>
+          </figcaption>
+        </figure>
 
         <p className="mt-8 text-xs leading-relaxed text-graphite/80">
           US PIRG Education Fund, Food for Thought 2026; FDA statement, January
@@ -458,35 +551,87 @@ const RecallGuard = () => {
 
       {/* Why it exists. Eyebrow is "Why RecallGuard", not "Why" — the section
           above already answers why the problem is worth solving, and two
-          adjacent sections both labelled "Why" read as an editing slip. */}
+          adjacent sections both labelled "Why" read as an editing slip.
+
+          The title was "Most recall apps tell everyone everything" until
+          2026-08-17. That argued against competing apps only, which is the
+          narrowest version of the problem and lets a reader think "I don't use
+          a recall app, so this isn't about me." The channels people actually
+          rely on are mailing lists, the news, and word of mouth, and each fails
+          differently — the list buries you, the news skips almost everything.
+          Naming all of them is what makes the section land for someone who has
+          never installed a recall app in their life.
+
+          CAREFUL — claims.md bans pointing readers at a free alternative (an
+          FAQ naming the FDA's free recall email list was cut 2026-08-12).
+          Anthony asked for the mailing-list mention on 2026-08-17 as a NOISE
+          critique, which is the opposite intent. The line stays inside that
+          permission only while it describes what the channel does to you: never
+          call it free, never say which agency runs it, never say how to join.
+          Describe the failure, not the door.
+
+          The 320 figure is deliberately the same one the data section already
+          cited and sourced, so this section borrows a proven number instead of
+          introducing an unsourced "hundreds a year."
+
+          The middle paragraph argues VOLUME, on purpose. It used to end on "none
+          of it can answer the only question you have: is this in my kitchen,"
+          which is the same beat "Why nobody called" lands 600px earlier, so the
+          second telling fell flat and wasted the section's best line. These two
+          sections describe different failures and have to keep doing so: that
+          one is nobody is obliged to tell you, this one is that the channels
+          which do tell you say too much to be heard. Do not reintroduce the
+          "in my kitchen" phrasing here. */}
       <Section
         eyebrow="Why RecallGuard"
-        title="Most recall apps tell everyone everything"
+        title="Everything else is either noise or silence"
       >
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
           <div className="space-y-5">
             <Paragraph>
-              Which is the same as telling you nothing. Fifty notifications a
-              week about recalls that don't touch your household, and the one
-              that actually matters for your peanut-allergic kid sits three
-              screens down.
+              There are other ways to hear about a recall. A mailing list will
+              send you all 320 of last year's, written for regulators and sorted
+              by nothing. The news covers the handful with a body count, for
+              about a day. Other apps push every recall to every user, which is
+              the same firehose with a nicer icon.
+            </Paragraph>
+            <Paragraph>
+              None of it is wrong. There is just far too much of it. Fifty
+              alerts a week about food you never bought is not information, it
+              is a habit of dismissal, and you build that habit on the 49 that
+              never mattered. The one about your peanut-allergic kid arrives
+              into a channel you have already learned to ignore.
             </Paragraph>
             <Paragraph>
               RecallGuard inverts it. You say what matters (your allergens, your
-              pets, what you actually buy) and the app filters the FDA's stream
-              down to the recalls that could plausibly reach your kitchen.
-              Everything else stays in the feed, unread, where it belongs.
+              pets, what you actually buy) and the app filters the FDA and USDA
+              streams down to the recalls that could plausibly reach your
+              kitchen. Everything else stays in the feed, unread, where it
+              belongs.
             </Paragraph>
           </div>
-          {/* Editorial photo, not a product shot. Per assets/editorial/CREDITS.md
-              these run as atmosphere behind type — never as the thing claiming
-              to be a recalled product. Pexels license, free commercial, no
-              attribution required. No faces, no legible brands. */}
+          {/* Editorial photo, not a product shot. These run as atmosphere
+              behind type — never as the thing claiming to be a recalled
+              product. License recorded in src/assets/images/CREDITS.md.
+              No faces, no legible brands.
+
+              Tree nuts, replacing the eggs-on-a-counter shot on 2026-08-17.
+              Anthony asked for imagery pointing at WHY things get recalled, and
+              undeclared allergens are the single largest cause of US food
+              recalls, so the subject is the hazard category rather than a
+              generic kitchen. It stops at the ingredient: photographing a
+              finished packaged item would edge toward implying a real product
+              was recalled, which is the line the no-legible-brands rule exists
+              to hold.
+
+              Chosen over two peanut shots partly because it is the only
+              candidate that is natively portrait — the frame below is 4:5, and
+              the landscape alternatives lost their composition to the crop. */}
           <img
-            src={kitchenPhoto}
-            alt="A carton of eggs on a floured wooden counter beside a whisk"
-            width="778"
-            height="1100"
+            src={allergenPhoto}
+            alt="Four wooden spoons holding almonds, cashews, pecans, and macadamia nuts on a pale marble surface"
+            width="900"
+            height="1350"
             loading="lazy"
             className="mx-auto aspect-[4/5] w-full max-w-sm rounded-2xl object-cover"
           />
