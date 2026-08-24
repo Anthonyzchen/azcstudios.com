@@ -1,7 +1,13 @@
 import gsap from "gsap";
 import { CustomEase } from "gsap/CustomEase";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-gsap.registerPlugin(CustomEase);
+// One registration site for the whole app. Three components used to call
+// registerPlugin(ScrollTrigger) themselves, which is idempotent and so worked,
+// but a top-level side-effectful call also pins the module into the bundle:
+// Rollup cannot drop an unused component whose module body has effects, so
+// ScrubVideo was shipping to production before any page imported it.
+gsap.registerPlugin(CustomEase, ScrollTrigger);
 
 /**
  * Shared motion system.

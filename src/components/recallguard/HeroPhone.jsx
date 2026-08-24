@@ -1,12 +1,9 @@
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { EASE, DURATION, STAGGER } from "../../lib/motion";
 import { Chip } from "./Chip";
 import feedScreenshot from "../../assets/images/recallguard-feed.webp";
-
-gsap.registerPlugin(ScrollTrigger);
 
 /**
  * The hero screenshot and the annotation chips floating over it.
@@ -86,7 +83,10 @@ export const HeroPhone = ({ chips }) => {
             .toArray("[data-chip]", scopeRef.current)
             .forEach((node) => {
               gsap.to(node, {
-                x: Number(node.dataset.drift),
+                // `|| 0` rather than a bare Number(): a chip added without a
+                // drift value would otherwise yield NaN, and GSAP writes a
+                // broken transform for it without complaining.
+                x: Number(node.dataset.drift) || 0,
                 ease: "none",
                 scrollTrigger: {
                   trigger: scopeRef.current,
@@ -104,6 +104,11 @@ export const HeroPhone = ({ chips }) => {
         },
       );
 
+      // Belt and braces. useGSAP's own revert already kills this matchMedia,
+      // because `new MatchMedia()` pushes itself onto the active context and
+      // Context.kill reverts non-Tween entries before running cleanups. Kept
+      // because it costs nothing and makes the lifecycle legible; it is a
+      // no-op, not a requirement, so don't copy it forward as if it were one.
       return () => mm.revert();
     },
     { scope: scopeRef },

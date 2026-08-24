@@ -1,11 +1,8 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { EASE, DURATION } from "../../lib/motion";
 import appIcon from "../../assets/images/recallguard-icon.png";
-
-gsap.registerPlugin(ScrollTrigger);
 
 // iPhone logical points. Everything inside the screen is authored against this
 // box and then scaled to whatever width the layout gives us, which is the same

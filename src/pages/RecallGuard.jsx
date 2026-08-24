@@ -420,8 +420,14 @@ const RecallGuard = () => {
 
           {/* Same four annotations below the phone once there is no room to
               float them. A grid rather than the absolute layout above: at this
-              width they are a caption, and a caption reads in order. */}
-          <ul className="mx-auto grid w-full max-w-[420px] grid-cols-1 gap-2 sm:max-w-none sm:grid-cols-2 xl:hidden">
+              width they are a caption, and a caption reads in order.
+
+              lg:col-start-2 is required, not cosmetic. This is the third direct
+              child of a two-column grid, so it would otherwise flow to row two
+              column one — under the COPY rather than under the phone — across
+              the whole 1024-1279px band, which is exactly the band where it is
+              the visible version of the annotations. */}
+          <ul className="mx-auto grid w-full max-w-[420px] grid-cols-1 gap-2 sm:max-w-none sm:grid-cols-2 lg:col-start-2 xl:hidden">
             {HERO_CHIPS.map((chip) => (
               <li key={chip.title}>
                 <Chip title={chip.title} detail={chip.detail} />
@@ -486,10 +492,13 @@ const RecallGuard = () => {
         </div>
       </Section>
 
-      {/* The problem, in numbers. This and the case study below have to be
-          direct children of the entrance ref — usePageEntrance staggers the
-          container's immediate children only, so a section nested one level
-          deeper would pop in with no animation while its neighbours fade up. */}
+      {/* The problem, in numbers. This has to be a direct child of the entrance
+          ref — usePageEntrance staggers the container's immediate children
+          only, so a section nested one level deeper would pop in with no
+          animation while its neighbours fade up. The case study now lives
+          INSIDE this section rather than beside it, so it no longer gets its
+          own stagger step, which is the intended reading: one argument, not
+          two. */}
       <Section
         eyebrow="Why it matters"
         title="The system that catches this is getting smaller."
@@ -612,10 +621,14 @@ const RecallGuard = () => {
           <p className="mb-5 font-Inter text-eyebrow uppercase text-graphite/60">
             After the notice
           </p>
-          <h2 className="mb-6 max-w-prose text-balance font-Fraunces text-2xl font-normal leading-tight text-ink sm:text-3xl">
+          {/* h3, not h2. This card used to be its own Section with no title,
+              so its heading sat level with every other section heading. Folding
+              it into "Why it matters" — which does render an h2 — made it a
+              subsection, and the markup has to say so. */}
+          <h3 className="mb-6 max-w-prose text-balance font-Fraunces text-2xl font-normal leading-tight text-ink sm:text-3xl">
             The recall published in June 2025. People were still getting sick in
             November.
-          </h2>
+          </h3>
           <Paragraph className="mb-10 max-w-prose">
             Listeria in pre-cooked pasta, sold as prepared chicken fettuccine
             alfredo at Walmart and Kroger. Seventeen people had been identified
@@ -698,10 +711,20 @@ const RecallGuard = () => {
             say which half is required. A screen reader gets "What the rules
             require: 1, 2, 3. What nothing requires: 1." */}
         <figure className="m-0">
-          <p className="mb-4 font-Inter text-xs uppercase tracking-[0.16em] text-graphite/80">
+          <p
+            id="chain-required"
+            className="mb-4 font-Inter text-xs uppercase tracking-[0.16em] text-graphite/80"
+          >
             What the rules require
           </p>
-          <ol className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+          {/* aria-labelledby, because the required/absent distinction is the
+              whole diagram and it is carried visually by border style alone.
+              Read linearly the headings do the job, but anyone navigating by
+              list lands on two adjacent unnamed lists and loses the point. */}
+          <ol
+            aria-labelledby="chain-required"
+            className="flex flex-col gap-3 sm:flex-row sm:items-stretch"
+          >
             {CHAIN_REQUIRED.map((step, i) => (
               <li
                 key={step.label}
@@ -749,23 +772,24 @@ const RecallGuard = () => {
             />
           </div>
 
-          <p className="mb-4 font-Inter text-xs uppercase tracking-[0.16em] text-graphite/80">
+          <p
+            id="chain-absent"
+            className="mb-4 font-Inter text-xs uppercase tracking-[0.16em] text-graphite/80"
+          >
             What nothing requires
           </p>
-          <ol className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
-            {CHAIN_ABSENT.map((step, i) => (
+          {/* No arrow branch here, unlike the required list above: this group
+              is a single node since the 2026-08-24 correction, so a connector
+              could never render. Restore it if the group ever grows back. */}
+          <ol
+            aria-labelledby="chain-absent"
+            className="flex flex-col gap-3 sm:flex-row sm:items-stretch"
+          >
+            {CHAIN_ABSENT.map((step) => (
               <li
                 key={step.label}
                 className="flex items-stretch gap-3 sm:flex-1"
               >
-                {i > 0 && (
-                  <span
-                    aria-hidden="true"
-                    className="rotate-90 self-center text-graphite/40 sm:rotate-0"
-                  >
-                    &rarr;
-                  </span>
-                )}
                 <div className="flex flex-1 items-center rounded-xl border border-dashed border-graphite/40 px-4 py-3 text-[0.9rem] leading-snug text-ink">
                   {step.label}
                 </div>

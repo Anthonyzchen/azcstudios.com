@@ -1,9 +1,6 @@
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
 
 /**
  * A screen recording whose playhead is driven by scroll position, inside a
@@ -34,21 +31,50 @@ export const ScrubVideo = ({ src, poster, label, className = "" }) => {
   );
 
   useGSAP(
-    () => {
+    (context, contextSafe) => {
       const video = videoRef.current;
       if (!video || reduced) return;
 
+      const onError = () =>
+        console.error("[ScrubVideo] video failed to load:", {
+          src,
+          error: video.error,
+        });
+      video.addEventListener("error", onError);
+
       // Duration is NaN until metadata lands, and a scrub against NaN silently
       // parks the playhead at frame zero for the whole section.
-      const attach = () => {
+      //
+      // contextSafe is REQUIRED here, not stylistic. GSAP captures new
+      // animations into the enclosing context only while that context is
+      // executing synchronously, so on the loadedmetadata path this trigger
+      // would register with nothing and useGSAP's revert would never see it.
+      // With `pin` that is not merely a leak: pinning reparents the element
+      // into a pin-spacer div React does not know about, and the orphaned
+      // trigger survives unmount to throw removeChild on the next route change.
+      const attach = contextSafe(() => {
         const duration = video.duration;
-        if (!Number.isFinite(duration) || duration === 0) return;
+        if (!Number.isFinite(duration) || duration === 0) {
+          console.error("[ScrubVideo] unusable video duration:", {
+            src,
+            duration,
+          });
+          return;
+        }
 
         ScrollTrigger.create({
           trigger: scopeRef.current,
           start: "top top",
           end: () => `+=${window.innerHeight * 1.6}`,
           pin: true,
+          // "transform", not the default "fixed". usePageEntrance animates
+          // filter on every section and leaves blur(0px) inline, and a
+          // non-none filter makes that element the containing block for
+          // position: fixed — so a fixed pin would attach to the Section
+          // rather than the viewport and scroll away with it. It would also
+          // have split by user setting, since usePageEntrance skips itself
+          // under reduced motion and writes no filter at all.
+          pinType: "transform",
           scrub: 0.4,
           onUpdate: (self) => {
             // Clamp off the last frame: seeking exactly to `duration` makes
@@ -60,13 +86,20 @@ export const ScrubVideo = ({ src, poster, label, className = "" }) => {
           },
         });
 
-        ScrollTrigger.refresh();
-      };
+        // No ScrollTrigger.refresh() here. It is global rather than scoped, so
+        // it re-measures every trigger on the page — and loadedmetadata
+        // typically lands inside the entrance timeline, meaning every other
+        // trigger would re-measure against elements mid-transform. create()
+        // computes its own start and end anyway.
+      });
 
       if (video.readyState >= 1) attach();
       else video.addEventListener("loadedmetadata", attach, { once: true });
 
-      return () => video.removeEventListener("loadedmetadata", attach);
+      return () => {
+        video.removeEventListener("loadedmetadata", attach);
+        video.removeEventListener("error", onError);
+      };
     },
     { scope: scopeRef, dependencies: [reduced] },
   );
