@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import products from "../data/products.json";
 import allergenPhoto from "../assets/images/recallguard-allergens.jpg";
-import feedScreenshot from "../assets/images/recallguard-feed.webp";
 import { usePageEntrance } from "../lib/usePageEntrance";
 import {
   Section,
@@ -12,6 +11,7 @@ import {
   FaqItem,
   WaitlistForm,
 } from "../components/ui";
+import { Chip, HeroPhone, LockScreenPhone } from "../components/recallguard";
 import { STUDIO_NAME } from "../lib/site";
 
 const product = products.find((p) => p.slug === "recallguard");
@@ -37,38 +37,150 @@ const FEATURES = [
   },
 ];
 
-// Every figure here is logged in recall-guard/marketing/facts.md with its
-// source and last-verified date, re-confirmed against source 2026-08-14. Do not
-// add a number to this page that isn't in that ledger, and don't round one that
-// is.
+// Annotations on the hero screenshot. Every one restates something already
+// legible in recallguard-feed.webp — the Yours/All control, the plain-English
+// severity label, the "Recalled by USDA FSIS" attribution, the Pantry tab — so
+// none of them is a claim the picture doesn't already make. That constraint is
+// the point: an annotation the reader can check is worth more than four they
+// have to take on faith.
 //
-// The framing is load-bearing and easy to "improve" into something false: recall
-// COUNTS were essentially flat (296 → 320) and outbreak-associated illnesses
-// actually FELL (1,804 → 1,003). What rose is the volume of food per recall and
-// the severity of the outcomes. "Recalls are surging" is the obvious headline
-// and it does not survive a fact-check, so this section never says it.
-const TREND_STATS = [
+// Do NOT add a chip about allergen matching here. That screenshot is the "All"
+// feed showing recent recalls across all categories, so an allergen chip would
+// contradict the very image it points at. Allergens are covered in the features
+// grid and the FAQ, where nothing is being annotated.
+//
+// `position` places the chip at xl, NOT lg. Below 1280px the page content is
+// still fluid, so the screenshot column keeps shrinking while the chips do not:
+// at exactly 1024px the gutter collapses to ~73px against a 176px chip and each
+// one buries 103px of the phone, which is worse than the layout this replaced.
+// From 1280px up the content width is capped at 68rem, the column settles at a
+// fixed 592px, and the overlap is a stable 20px. Below xl they render as a plain
+// row under the phone instead.
+//
+// `side` drives which way the chip slides when the phone is hovered: outward,
+// away from the screenshot it is sitting on.
+//
+// `drift` is horizontal travel across the hero's scroll range, and it points
+// the same way: negative for left-side chips, positive for right. It runs
+// one-directionally from the laid-out position, so scroll 0 keeps the designed
+// 20px overlap and scrolling uncovers the phone.
+//
+// Magnitudes are set by what each chip can travel into, not by taste:
+//   1 (left, top 0)     -70  nothing beside it, it clears the headline entirely
+//   2 (right, 26%)      +80  page gutter, ~190px of room at 1471px
+//   3 (left, 54%)       -35  sits beside the lede, and the grid gap is only 64px
+//   4 (right, bottom)   +95  page gutter again, the freest of the four
+// Left is tighter than right because the copy column is there. Varying them is
+// also what sells the depth: matched values read as one rigid sheet sliding.
+const HERO_CHIPS = [
   {
-    from: "45.0M",
-    to: "109.7M",
-    label: "FDA units of food pulled from shelves",
-    period: "First three quarters, 2024 to 2025",
+    title: "Two feeds",
+    detail: "Yours is filtered. All is everything.",
+    side: "left",
+    position: "xl:left-0 xl:top-0",
+    drift: -70,
   },
   {
-    from: "7.9M",
-    to: "60M",
-    label: "Pounds of meat and poultry recalled by the USDA",
-    period: "First three quarters, 2024 to 2025",
+    title: "Severity in plain English",
+    detail: "Serious risk, possible risk, minor issue",
+    side: "right",
+    position: "xl:right-0 xl:top-[26%]",
+    drift: 80,
   },
   {
-    // Different year range from the two above, which is exactly why every stat
-    // carries its own period line rather than one shared caption.
-    from: "~240",
-    to: "500+",
-    label: "People hospitalized or killed by contaminated food",
-    period: "2023 to 2024",
+    title: "FDA and USDA both",
+    detail: "Meat, poultry, and egg included",
+    side: "left",
+    position: "xl:left-0 xl:top-[54%]",
+    drift: -35,
+  },
+  {
+    title: "Your pantry",
+    detail: "Added by barcode or receipt photo",
+    side: "right",
+    position: "xl:right-0 xl:bottom-[6%]",
+    drift: 95,
   },
 ];
+
+// The three beats beside the lock screen. Ordered as the moment actually
+// happens rather than as a feature list: what fires it, what it says, what you
+// do about it.
+//
+// The middle beat quotes the app's own push template. Keep it that way — the
+// section's whole argument is that this is the real thing that lands, and a
+// prettier invented sentence would quietly turn a demonstration back into a
+// promise.
+const ALERT_BEATS = [
+  {
+    title: "The agency publishes",
+    body: "We poll the FDA and USDA feeds on a schedule and match each new notice against your profile and your pantry.",
+  },
+  {
+    title: "The alert leads with the reason",
+    body: "Severity first, then the hazard or the allergen, then who recalled it. Enough to act on without unlocking your phone.",
+  },
+  {
+    title: "You check one shelf",
+    body: "Tap through for lot codes, dates, and what to do with it. Mark it handled and it stops following you.",
+  },
+];
+
+// Every figure here is logged in recall-guard/marketing/facts.md with its
+// source and last-verified date. Do not add a number to this page that isn't in
+// that ledger, and don't round one that is.
+//
+// RESTRUCTURED 2026-08-24. The section used to run three before/after trend
+// stats and argue "recalls got bigger". That was retired for two reasons, both
+// recorded in the ledger:
+//
+//   1. It rested on a metric that inverts. Recall volume measures enforcement
+//      activity, not food safety. FDA units FELL 18.7% in H1 2026 (84.6M ->
+//      68.8M) in the same period the agency lost roughly one in five of its
+//      food-and-drug safety workforce. Refreshing the stat would have flipped
+//      its direction; leaving it stale was the only way to keep it.
+//   2. It argued a problem the app cannot fix. Nothing in RecallGuard makes
+//      recalls smaller or rarer. The notification gap is the closable one.
+//
+// The severity stat (~240 -> 500+ hospitalized or killed) came out for a third
+// reason: it CANNOT be refreshed. PIRG's Food for Thought 2026 carries no 2025
+// successor — checked 2026-08-24 — and its nearest equivalent, outbreak-
+// associated illnesses, FELL from 1,804 to 1,003. Don't go looking again.
+//
+// Every figure below is current and moves the RIGHT way: each one gets worse if
+// the situation gets worse. That is the test any replacement has to pass.
+//
+// HARD RULE, unchanged: state the staffing collapse and the recall figures as
+// CONCURRENT, never causal. No source establishes the link and the section does
+// not need it. Also never say the FDA's budget was cut — the proposed cut was
+// rejected and H.R. 5371 funds the agency at $6.957B.
+const CAPACITY_FIGURES = [
+  { figure: "432", label: "FDA investigators, against 36,600 food facilities" },
+  {
+    figure: "3,859",
+    label: "employees left the FDA in 2025, and 473 more in 2026",
+  },
+  {
+    figure: "29%",
+    label: "fewer foreign food inspections than the year before",
+  },
+];
+
+// The only before/after left on the page. It survived the restructure because
+// it is the one volume figure that is both CURRENT and still rising: refreshed
+// 2026-08-24 from the Q1-Q3 2024->2025 window (7.9M -> 60M) to the newest one.
+//
+// The ~1.5M baseline is DERIVED, not quoted, so it keeps its tilde. Two
+// independent routes land on it: Food Processing gives H1 2026 as 37.18M at a
+// 2,432% increase (implies 1.53M), and Sedgwick puts 58.52M of the 59.99M
+// Q1-Q3 2025 total inside Q3 alone (implies 1.47M). Do not drop the tilde and
+// do not "tidy" it into a round number.
+const USDA_VOLUME = {
+  from: "~1.5M",
+  to: "37.2M",
+  label: "Pounds of meat and poultry recalled by the USDA",
+  period: "First half, 2025 to 2026",
+};
 
 // The toll is quoted from the CDC's final case count, not from the interim
 // numbers that circulated while the outbreak was open (an earlier report had
@@ -95,16 +207,31 @@ const OUTBREAK_TOLL = [
 // caveat used to live inside the third node, which made that box twice the
 // height of its neighbours and broke the read of three equal steps. It sits
 // under the row now, where it qualifies the step without deforming the chain.
+//
+// CORRECTED 2026-08-24 (Anthony caught it). "The store that sold it" used to
+// sit in the ABSENT group, on PIRG's wording that nobody has to contact the
+// stores. That is wrong, and the regulation is unambiguous: 21 CFR 117.139
+// requires a covered facility to keep a written recall plan whose procedures
+// "directly notify the direct consignees of the food being recalled", and
+// consignees are instructed to extend the recall to their own customers. The
+// chain to the shelf is mandatory, which is precisely why product does come off
+// shelves. Confirming that PIRG said a thing is not the same as confirming the
+// thing, and this row was verified the first way.
+//
+// The corrected diagram is STRONGER, not weaker: a legally compelled chain that
+// runs all the way to the shelf and then stops one step short of the person who
+// already carried the food home. Do not re-widen this into "nobody has to tell
+// anyone" — the narrow version is the true one and it puts the product exactly
+// at the break.
 const CHAIN_REQUIRED = [
   { label: "The company finds the problem" },
   { label: "It tells the FDA or USDA" },
-  { label: "A notice is published" },
+  { label: "The stores it sold to are told" },
 ];
 
-const CHAIN_ABSENT = [
-  { label: "The store that sold it" },
-  { label: "The person who bought it" },
-];
+// One node, on purpose. It was two, and a lone dashed box at the end of a
+// three-box required chain states the gap harder than a pair did.
+const CHAIN_ABSENT = [{ label: "The person who bought it" }];
 
 const SEVERITY_TIERS = [
   {
@@ -186,7 +313,11 @@ const RecallGuard = () => {
     <div ref={entranceRef}>
       {/* Hero */}
       <section className="px-gutter pb-16 pt-20 sm:pb-20 sm:pt-28">
-        <div className="mx-auto grid max-w-content items-center gap-12 lg:grid-cols-2 lg:gap-16">
+        {/* Asymmetric on purpose: the copy column is capped so the screenshot
+            column keeps enough gutter for the annotation chips to sit beside
+            the phone instead of on top of it. See the arithmetic in the comment
+            above that box before changing either number. */}
+        <div className="mx-auto grid max-w-content items-center gap-12 lg:grid-cols-[minmax(0,27rem)_1fr] lg:gap-16">
           <div>
             <div className="mb-6 flex items-center gap-3">
               <span
@@ -279,17 +410,81 @@ const RecallGuard = () => {
               kitchen photo (now moved down to Why) on the rule that these
               photos are atmosphere and never product shots. That rule still
               holds for the photography; it just shouldn't cost the hero the
-              only image that shows what someone is signing up for. */}
-          <img
-            src={feedScreenshot}
-            alt="RecallGuard's recall feed, showing FDA and USDA recalls with severity labels"
-            width="660"
-            height="1127"
-            loading="eager"
-            className="mx-auto w-full max-w-[300px] rounded-[1.75rem] border border-line shadow-sm"
-          />
+              only image that shows what someone is signing up for.
+
+              This stays a real screenshot of the shipping app, never a
+              reconstruction. The chips around it are the annotation layer; the
+              thing being annotated has to be genuine or the annotations are
+              worth nothing. */}
+          <HeroPhone chips={HERO_CHIPS} />
+
+          {/* Same four annotations below the phone once there is no room to
+              float them. A grid rather than the absolute layout above: at this
+              width they are a caption, and a caption reads in order. */}
+          <ul className="mx-auto grid w-full max-w-[420px] grid-cols-1 gap-2 sm:max-w-none sm:grid-cols-2 xl:hidden">
+            {HERO_CHIPS.map((chip) => (
+              <li key={chip.title}>
+                <Chip title={chip.title} detail={chip.detail} />
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
+
+      {/* The moment the product exists for, and until now the one thing the
+          page never showed. Everything above and below this argues that a
+          recall never reaches you; this is the single screen where it does.
+
+          It sits before the argument sections on purpose. The page used to run
+          four consecutive problem sections — roughly 600 words — before the
+          reader saw the app do anything, which is a long time to spend agreeing
+          with someone who hasn't shown you their work yet.
+
+          The eyebrow names the moment rather than the feature ("Alerts",
+          "Notifications"). A reader can place themselves in "when it
+          publishes"; nobody has ever pictured themselves inside "Alerts". */}
+      <Section
+        eyebrow="When it publishes"
+        title="You hear about it the same day."
+      >
+        {/* Fixed phone column rather than a 50/50 split, matching the Pricing
+            section below. An even split left the 300px screen floating in the
+            middle of a 590px column with a canyon between it and the copy. */}
+        <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-20">
+          <LockScreenPhone />
+
+          <div>
+            <Paragraph className="mb-8 max-w-prose">
+              This is the notification the app actually sends, generated by the
+              same template that builds every push. The recall is the pre-cooked
+              pasta listeria case below, on the day its notice published.
+            </Paragraph>
+
+            <ol className="flex flex-col gap-8">
+              {ALERT_BEATS.map((beat, i) => (
+                <li key={beat.title} className="flex gap-5">
+                  {/* Numbered because this genuinely is a sequence in time.
+                      The chain diagram further down earns its ordering the
+                      same way; the features grid does not, which is why that
+                      one stays unnumbered. */}
+                  <span
+                    aria-hidden="true"
+                    className="mt-1 font-Inter text-xs tabular-nums text-rg"
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <h3 className="mb-2 font-Fraunces text-lg text-ink">
+                      {beat.title}
+                    </h3>
+                    <Paragraph>{beat.body}</Paragraph>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </Section>
 
       {/* The problem, in numbers. This and the case study below have to be
           direct children of the entrance ref — usePageEntrance staggers the
@@ -297,24 +492,55 @@ const RecallGuard = () => {
           deeper would pop in with no animation while its neighbours fade up. */}
       <Section
         eyebrow="Why it matters"
-        title="Recalls didn't get more common. They got bigger."
+        title="The system that catches this is getting smaller."
       >
         <Paragraph className="mb-10 max-w-prose">
-          The count barely moved: 296 food recalls in 2024, 320 in 2025. What
-          changed is how much food each one covers, and how badly they end.
+          The number of recalls barely moved: 296 in 2024, 320 in 2025. What
+          changed is how many people are watching, and how large a single recall
+          has become.
         </Paragraph>
 
-        <div className="grid gap-x-12 gap-y-10 sm:grid-cols-3">
-          {TREND_STATS.map((stat) => (
-            <Stat
-              key={stat.label}
-              from={stat.from}
-              to={stat.to}
-              label={stat.label}
-              period={stat.period}
-            />
+        {/* Same flex-col-reverse pairing as the outbreak toll further down: the
+            label is the dt and the figure the dd, so a screen reader gets
+            "FDA investigators, 432" while the column still paints the number
+            above its label. */}
+        <dl className="grid gap-x-12 gap-y-8 sm:grid-cols-3">
+          {CAPACITY_FIGURES.map((item) => (
+            <div key={item.label} className="flex flex-col-reverse">
+              <dt className="mt-2 text-[0.95rem] leading-snug text-graphite">
+                {item.label}
+              </dt>
+              <dd className="font-Fraunces text-4xl text-ink sm:text-5xl">
+                {item.figure}
+              </dd>
+            </div>
           ))}
+        </dl>
+
+        <Paragraph className="mt-10 max-w-prose">
+          The FDA's own internal estimate is that it needs about 1,500
+          investigators. It has not met the domestic inspection targets Congress
+          set for it since 2018, and it names understaffing as its greatest
+          barrier to getting there. Foreign inspections last year ran at their
+          lowest level since 2011, outside the pandemic.
+        </Paragraph>
+
+        {/* The one before/after left on the page, and the only trend figure
+            that is both current and still pointing the right way. */}
+        <div className="mt-12 max-w-sm">
+          <Stat
+            from={USDA_VOLUME.from}
+            to={USDA_VOLUME.to}
+            label={USDA_VOLUME.label}
+            period={USDA_VOLUME.period}
+          />
         </div>
+
+        <Paragraph className="mt-8 max-w-prose">
+          Nine recalls, against twenty-four the year before. Fewer actions, each
+          one vastly larger, and the odds that a single recall touches something
+          in your kitchen rise with its size.
+        </Paragraph>
 
         {/* Same card treatment as "What's covered" further down the page, so the
             two read as the same kind of aside rather than two inventions. */}
@@ -349,14 +575,18 @@ const RecallGuard = () => {
             what substantiate every figure above them, so they have to clear AA
             contrast — fine print is still print. */}
         <p className="mt-8 text-xs leading-relaxed text-graphite/80">
-          Sources: US PIRG Education Fund, Food for Thought 2025 and 2026;
-          Sedgwick Recall Index, Q3 2025.
+          Sources: US GAO, GAO-25-107571; OPM figures via FoodNavigator;
+          ProPublica on FDA foreign inspections; Food Processing on Sedgwick
+          Recall Index data, first half 2026; US PIRG Education Fund, Food for
+          Thought 2026.
         </p>
-      </Section>
 
-      {/* The case study. pt-0 keeps it reading as the second half of the section
-          above rather than a fresh topic, the same way the closing CTA hangs off
-          the FAQ.
+        {/* The case study, now inside the section above rather than carrying its
+          own header. It was already `pt-0` to read as the second half of that
+          section; folding it in finishes the job, because the two were never
+          two arguments. The stats say recalls got bigger and worse, and this is
+          the one that shows what "worse" looked like. One header, one argument,
+          and the reader reaches the product a screen sooner.
 
           THIS BLOCK ARGUES ONE THING AND MUST KEEP ARGUING IT: illnesses kept
           coming in AFTER the recall was public. That is the gap RecallGuard
@@ -378,8 +608,7 @@ const RecallGuard = () => {
              past the recall and well beyond listeria's ~70-day incubation, so
              the late cases are genuinely post-recall. Say "still getting sick,"
              never a specific onset date we don't have. */}
-      <Section className="pt-0">
-        <div className="rounded-2xl border border-line px-6 py-10 sm:px-10 sm:py-12">
+        <div className="mt-16 rounded-2xl border border-line px-6 py-10 sm:px-10 sm:py-12">
           <p className="mb-5 font-Inter text-eyebrow uppercase text-graphite/60">
             After the notice
           </p>
@@ -455,18 +684,19 @@ const RecallGuard = () => {
           that most recalls go unpublished. */}
       <Section
         eyebrow="Why nobody called"
-        title="No rule says they have to"
+        title="The rules stop one step short of you"
         width="prose"
       >
         <Paragraph className="mb-10">
-          A recall is a relay. Here is every handoff it is actually obliged to
-          make.
+          A recall is a relay, and most of it is compulsory. The product really
+          does come off the shelf. Here is every handoff the system is actually
+          obliged to make, and the one it isn't.
         </Paragraph>
 
         {/* Arrows are decorative and hidden from assistive tech; the ordered
             lists carry the sequence on their own, and the two group headings
             say which half is required. A screen reader gets "What the rules
-            require: 1, 2, 3. What nothing requires: 1, 2." */}
+            require: 1, 2, 3. What nothing requires: 1." */}
         <figure className="m-0">
           <p className="mb-4 font-Inter text-xs uppercase tracking-[0.16em] text-graphite/80">
             What the rules require
@@ -492,9 +722,15 @@ const RecallGuard = () => {
             ))}
           </ol>
 
+          {/* Two separate limits, and they were one line before the 2026-08-24
+              correction. The first is about the chain (it is mandatory, but not
+              for every food or every producer). The second is about visibility
+              (a notice reaching the public is conditional, not automatic). */}
           <p className="mt-4 text-xs leading-relaxed text-graphite">
-            And only the ones judged serious enough. The FDA says plainly that
-            not all recalls get a press release or a page.
+            Required by 21 CFR 117.139, for the foods and facilities it covers.
+            A public notice is a separate step, and only for the ones judged
+            serious enough: the FDA says plainly that not all recalls get a
+            press release or a page.
           </p>
 
           {/* The break. This is the whole diagram — everything above it is
@@ -537,15 +773,30 @@ const RecallGuard = () => {
             ))}
           </ol>
 
+          {/* Concede the retailer programs rather than ignore them. Anyone who
+              shops at Costco has had one of these letters, and a reader who
+              knows the exception discounts the whole diagram if it pretends the
+              exception doesn't exist. Naming it and then naming its limits is
+              what makes the paragraph below land. */}
+          <p className="mt-4 text-xs leading-relaxed text-graphite">
+            A few chains do write to buyers off loyalty or membership records.
+            It is voluntary, it only reaches you if you used the card at that
+            chain, and PIRG graded 22 of the 26 largest US chains as failing on
+            recall communication.
+          </p>
+
           <figcaption className="mt-8 text-[0.95rem] leading-relaxed text-graphite">
-            So the notice sits in a federal feed, correct and public and unread.
-            Someone has to go and get it, and check it against your kitchen.
+            So the food leaves the shelf and the notice sits in a federal feed,
+            correct and public and unread. Neither of those reaches the box
+            already in your cupboard. Someone has to go and get that notice, and
+            check it against your kitchen.
           </figcaption>
         </figure>
 
         <p className="mt-8 text-xs leading-relaxed text-graphite/80">
-          US PIRG Education Fund, Food for Thought 2026; FDA statement, January
-          2025.
+          21 CFR 117.139 (recall plan requirements); FDA statement, January
+          2025; US PIRG Education Fund, Food for Thought 2026 and Food Recall
+          Failure (2020) for the supermarket grades.
         </p>
       </Section>
 
@@ -583,7 +834,7 @@ const RecallGuard = () => {
           which do tell you say too much to be heard. Do not reintroduce the
           "in my kitchen" phrasing here. */}
       <Section
-        eyebrow="Why RecallGuard"
+        eyebrow="In your kitchen"
         title="Everything else is either noise or silence"
       >
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
@@ -595,19 +846,20 @@ const RecallGuard = () => {
               about a day. Other apps push every recall to every user, which is
               the same firehose with a nicer icon.
             </Paragraph>
+            {/* Cut from three paragraphs to two on 2026-08-23. The section
+                still has to argue VOLUME and only volume — that the channels
+                which do tell you say too much to be heard — because "nobody is
+                obliged to tell you" is the separate failure "Why nobody called"
+                lands a screen earlier. The line about the peanut-allergic kid
+                came out here; that beat now lives in the features grid, which
+                sits immediately below. */}
             <Paragraph>
               None of it is wrong. There is just far too much of it. Fifty
               alerts a week about food you never bought is not information, it
               is a habit of dismissal, and you build that habit on the 49 that
-              never mattered. The one about your peanut-allergic kid arrives
-              into a channel you have already learned to ignore.
-            </Paragraph>
-            <Paragraph>
-              RecallGuard inverts it. You say what matters (your allergens, your
-              pets, what you actually buy) and the app filters the FDA and USDA
-              streams down to the recalls that could plausibly reach your
-              kitchen. Everything else stays in the feed, unread, where it
-              belongs.
+              never mattered. So you say what matters instead, and the app
+              filters the FDA and USDA streams down to the recalls that could
+              plausibly reach your kitchen.
             </Paragraph>
           </div>
           {/* Editorial photo, not a product shot. These run as atmosphere
@@ -636,13 +888,16 @@ const RecallGuard = () => {
             className="mx-auto aspect-[4/5] w-full max-w-sm rounded-2xl object-cover"
           />
         </div>
-      </Section>
 
-      {/* Features */}
-      <Section eyebrow="Features" title="What it does">
+        {/* The features grid used to sit under its own "Features / What it
+            does" header. It doesn't need one: the paragraph above ends on "you
+            say what matters instead," and these four are what you get to say.
+            Splitting them apart made the page state the argument, stop, and
+            then restate it as a feature list under a filing label. */}
+
         {/* Two columns, not three — four features in a 3-col grid orphans the
             last one. 2x2 balances and leaves the copy readable. */}
-        <div className="grid gap-x-12 gap-y-10 sm:grid-cols-2">
+        <div className="mt-16 grid gap-x-12 gap-y-10 sm:grid-cols-2">
           {FEATURES.map((feature) => (
             <div key={feature.title}>
               <div className="mb-5 h-px w-10 bg-rg" aria-hidden="true" />
@@ -676,11 +931,17 @@ const RecallGuard = () => {
         </div>
       </Section>
 
-      {/* Alert behavior */}
-      <Section eyebrow="Alerts" title="How notifications behave">
+      {/* Alert behavior. Eyebrow names what the section decides ("what gets
+          through") rather than the feature it belongs to ("Alerts"), and the
+          title is the sharpest sentence the section already had — it was the
+          lede, doing headline work from one size down. Its other half stays
+          below as the paragraph, so nothing was cut to make room. */}
+      <Section
+        eyebrow="What gets through"
+        title="A technicality never wakes you up."
+      >
         <Paragraph className="mb-8 max-w-prose">
-          A labeling technicality never wakes you up. A genuine hazard never
-          gets buried.
+          And a genuine hazard never gets buried.
         </Paragraph>
 
         <div className="overflow-x-auto">
