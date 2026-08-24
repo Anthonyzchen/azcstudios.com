@@ -19,6 +19,7 @@ Sourcing rules (keep the studio trust-safe):
 |---|---|---|---|---|
 | recallguard-allergens.jpg | Four wooden spoons of almonds, cashews, pecans, macadamias on pale marble. 900x1350. Used on `/recallguard` beside the "Everything else is either noise or silence" copy. Tree nuts stand in for undeclared allergens, the largest single cause of US food recalls. | [Pexels photo 5507631](https://www.pexels.com/photo/close-up-shot-of-assorted-nuts-on-a-wooden-spoon-5507631/) | Pexels License (free commercial, no attribution) | 2026-08-17 |
 | recallguard-feed.webp | RecallGuard's own recall feed screenshot. 660x1127. Hero image on `/recallguard`. | Own product | n/a | 2026-07-30 |
+| recallguard-icon.png | The RecallGuard app icon. Copied from `recall-guard/assets/images/icon.png`. Used at 38pt inside the lock-screen notification in `components/recallguard/LockScreenPhone.jsx`. Re-copy from the app if the icon is ever rebaked. | Own product | n/a | 2026-08-23 |
 
 ## Retired
 
