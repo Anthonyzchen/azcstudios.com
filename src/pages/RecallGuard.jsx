@@ -38,16 +38,28 @@ const FEATURES = [
 ];
 
 // Annotations on the hero screenshot. Every one restates something already
-// legible in recallguard-feed.webp — the Yours/All control, the plain-English
-// severity label, the "Recalled by USDA FSIS" attribution, the Pantry tab — so
-// none of them is a claim the picture doesn't already make. That constraint is
-// the point: an annotation the reader can check is worth more than four they
-// have to take on faith.
+// legible in recallguard-feed.webp — the protection card, the Yours/All
+// control, the plain-English severity label with its CLASS PENDING chip, the
+// PET badge — so none of them is a claim the picture doesn't already make.
+// That constraint is the point: an annotation the reader can check is worth
+// more than four they have to take on faith.
 //
-// Do NOT add a chip about allergen matching here. That screenshot is the "All"
-// feed showing recent recalls across all categories, so an allergen chip would
-// contradict the very image it points at. Allergens are covered in the features
-// grid and the FAQ, where nothing is being annotated.
+// Rewritten 2026-08-24 alongside the screenshot. The old capture predated the
+// severity-ramp redesign and showed a different app: four labelled tabs, an
+// "All"-feed header, a USDA FSIS card. Three of the four old chips pointed at
+// things no longer in frame. If you swap the screenshot again, re-read this
+// list against the new image first — a chip pointing at nothing is worse than
+// no chip.
+//
+// Do NOT add a chip about allergen matching here. This capture is the "Yours"
+// feed filtered by state, not by allergen, so an allergen chip would contradict
+// the image it points at. Allergens are covered in the features grid and the
+// FAQ, where nothing is being annotated.
+//
+// FDA-and-USDA coverage lost its chip in the rewrite: there is no FSIS card in
+// this capture. Deliberate (Anthony, 2026-08-24) — the claim is still true and
+// still belongs on the page, just not as an annotation over a picture that
+// doesn't show it.
 //
 // `position` places the chip at xl, NOT lg. Below 1280px the page content is
 // still fluid, so the screenshot column keeps shrinking while the chips do not:
@@ -66,39 +78,43 @@ const FEATURES = [
 // 20px overlap and scrolling uncovers the phone.
 //
 // Magnitudes are set by what each chip can travel into, not by taste:
-//   1 (left, top 0)     -70  nothing beside it, it clears the headline entirely
-//   2 (right, 26%)      +80  page gutter, ~190px of room at 1471px
-//   3 (left, 54%)       -35  sits beside the lede, and the grid gap is only 64px
-//   4 (right, bottom)   +95  page gutter again, the freest of the four
+//   1 (left, 6%)        -70  nothing beside it, it clears the headline entirely
+//   2 (right, 27%)      +80  page gutter, ~190px of room at 1471px
+//   3 (left, 50%)       -35  sits beside the lede, and the grid gap is only 64px
+//   4 (right, 72%)      +95  page gutter again, the freest of the four
 // Left is tighter than right because the copy column is there. Varying them is
 // also what sells the depth: matched values read as one rigid sheet sliding.
+//
+// The `top` percentages track features in the image and are not free: 6% sits
+// beside the protection card, 27% the Yours/All control, 50% the severity
+// label, 72% the PET badge. Re-measure against any new capture.
 const HERO_CHIPS = [
   {
-    title: "Two feeds",
-    detail: "Yours is filtered. All is everything.",
+    title: "Checked, not just listed",
+    detail: "Your pantry against every active recall",
     side: "left",
-    position: "xl:left-0 xl:top-0",
+    position: "xl:left-0 xl:top-[6%]",
     drift: -70,
   },
   {
-    title: "Severity in plain English",
-    detail: "Serious risk, possible risk, minor issue",
+    title: "Two feeds",
+    detail: "Yours is filtered to your state. All is everything.",
     side: "right",
-    position: "xl:right-0 xl:top-[26%]",
+    position: "xl:right-0 xl:top-[27%]",
     drift: 80,
   },
   {
-    title: "FDA and USDA both",
-    detail: "Meat, poultry, and egg included",
+    title: "Severity in plain English",
+    detail: "And it says so when the FDA hasn't rated it yet",
     side: "left",
-    position: "xl:left-0 xl:top-[54%]",
+    position: "xl:left-0 xl:top-[50%]",
     drift: -35,
   },
   {
-    title: "Your pantry",
-    detail: "Added by barcode or receipt photo",
+    title: "Pet food too",
+    detail: "The animal-food feed, flagged with a paw",
     side: "right",
-    position: "xl:right-0 xl:bottom-[6%]",
+    position: "xl:right-0 xl:top-[72%]",
     drift: 95,
   },
 ];
