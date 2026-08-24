@@ -155,32 +155,46 @@ const ALERT_BEATS = [
 // not need it. Also never say the FDA's budget was cut — the proposed cut was
 // rejected and H.R. 5371 funds the agency at $6.957B.
 const CAPACITY_FIGURES = [
-  { figure: "432", label: "FDA investigators, against 36,600 food facilities" },
+  {
+    // The only tile with a denominator, because it is the only figure that HAS
+    // one. 432 alone is a number; 432 against the 1,500 the agency itself says
+    // it needs is the shortfall, and the shortfall is the point. It used to be
+    // explained in a paragraph below the grid, where it read as commentary
+    // rather than as the fact it is.
+    //
+    // 1,500 is the FDA's own internal estimate, so the meta line attributes it.
+    // Never present it as an outside body's opinion of what the agency needs.
+    figure: "432",
+    of: "1,500",
+    label: "FDA investigators for 36,600 food facilities",
+    meta: "Against the 1,500 the agency's own estimate calls for",
+  },
   {
     figure: "3,859",
     label: "employees left the FDA in 2025, and 473 more in 2026",
+    meta: "Roughly one in five of the food and drug safety workforce",
   },
   {
     figure: "29%",
     label: "fewer foreign food inspections than the year before",
+    meta: "Lowest level since 2011, outside the pandemic",
+  },
+  {
+    // The one change-over-time figure among four magnitudes. It keeps the
+    // comparison in its meta line rather than as a from/to arrow, so all four
+    // tiles share a treatment. Refreshed 2026-08-24 from the Q1-Q3 2024->2025
+    // window (7.9M -> 60M) to the newest one, and it is the only volume figure
+    // that is both current and still rising.
+    //
+    // The ~1.5M baseline is DERIVED, not quoted, so it keeps its tilde. Two
+    // independent routes land on it: Food Processing gives H1 2026 as 37.18M at
+    // a 2,432% increase (implies 1.53M), and Sedgwick puts 58.52M of the 59.99M
+    // Q1-Q3 2025 total inside Q3 alone (implies 1.47M). Do not drop the tilde.
+    figure: "37.2M",
+    label: "pounds of meat and poultry recalled by the USDA",
+    meta: "First half of 2026, up from ~1.5M. A ten-year high",
   },
 ];
-
-// The only before/after left on the page. It survived the restructure because
-// it is the one volume figure that is both CURRENT and still rising: refreshed
-// 2026-08-24 from the Q1-Q3 2024->2025 window (7.9M -> 60M) to the newest one.
-//
-// The ~1.5M baseline is DERIVED, not quoted, so it keeps its tilde. Two
-// independent routes land on it: Food Processing gives H1 2026 as 37.18M at a
-// 2,432% increase (implies 1.53M), and Sedgwick puts 58.52M of the 59.99M
-// Q1-Q3 2025 total inside Q3 alone (implies 1.47M). Do not drop the tilde and
-// do not "tidy" it into a round number.
-const USDA_VOLUME = {
-  from: "~1.5M",
-  to: "37.2M",
-  label: "Pounds of meat and poultry recalled by the USDA",
-  period: "First half, 2025 to 2026",
-};
 
 // The toll is quoted from the CDC's final case count, not from the interim
 // numbers that circulated while the outbreak was open (an earlier report had
@@ -233,22 +247,58 @@ const CHAIN_REQUIRED = [
 // three-box required chain states the gap harder than a pair did.
 const CHAIN_ABSENT = [{ label: "The person who bought it" }];
 
+// Mirrors the app rather than paraphrasing it. `severity` keys the same ramp
+// the product uses (recall-guard tailwind.config.js `colors.sev`), and the
+// labels in `meaning` are the exact strings SEVERITY_LABEL and
+// PENDING_SEVERITY_LABEL produce in supabase/functions/_shared/notify.ts. If a
+// label changes there, it changes here.
+//
+// `pending` drives the swatch fill, and the rule it encodes is the app's:
+// HUE CARRIES DANGER, FILL CARRIES CERTAINTY. A graded recall gets a solid
+// stripe; one the FDA has published but not yet classified gets a 45-degree
+// hatch in the same hue. That distinction is the honest part of shipping
+// ungraded recalls at all — without it, a row we inferred as serious would be
+// pixel-identical to a confirmed Class I and the whole hedge would ride on the
+// word "Possible" in the label.
+//
+// Pending is not a fourth FDA class. It is the state a recall sits in between
+// the agency publishing it and the agency grading it, which is exactly the
+// window the app exists to cover, so it belongs in this table.
+// SVG and gradients cannot take a Tailwind class, so the ramp is mirrored here
+// as hex. Same values as `colors.sev` in tailwind.config.js — change both.
+const SEVERITY_HEX = {
+  3: "#c8102e",
+  2: "#a8630a",
+  1: "#57574f",
+};
+
 const SEVERITY_TIERS = [
   {
     tier: "Class I",
+    severity: 3,
     meaning: "Serious risk",
     behavior:
       "Loud push, high priority. Can bypass Do Not Disturb if you allow time-sensitive notifications.",
   },
   {
     tier: "Class II",
+    severity: 2,
     meaning: "Possible risk",
     behavior: "Standard push, delivered without a sound.",
   },
   {
     tier: "Class III",
+    severity: 1,
     meaning: "Minor issue",
     behavior: "No push at all. It shows up in your feed and stays there.",
+  },
+  {
+    tier: "Pending",
+    severity: 3,
+    pending: true,
+    meaning: "Published, not graded yet",
+    behavior:
+      "Pushed on our reading of the hazard, not the FDA's grade. Labelled \u201cPossible serious risk\u201d and marked class pending, so you can tell our inference from their call.",
   },
 ];
 
@@ -352,7 +402,7 @@ const RecallGuard = () => {
             {/* text-pretty, not text-balance: this is body copy, and balance
                 would even out the line lengths where all we want is to stop
                 "household." from orphaning onto a line by itself. */}
-            <p className="mb-8 max-w-prose text-pretty text-lede text-graphite">
+            <p className="mb-8 text-pretty text-lede text-graphite">
               RecallGuard watches FDA and USDA food recalls and tells you the
               same day one affects your household.
             </p>
@@ -456,14 +506,14 @@ const RecallGuard = () => {
         {/* Fixed phone column rather than a 50/50 split, matching the Pricing
             section below. An even split left the 300px screen floating in the
             middle of a 590px column with a canyon between it and the copy. */}
-        <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-20">
+        <div className="breakout grid items-center gap-12 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-20">
           <LockScreenPhone />
 
           <div>
-            <Paragraph className="mb-8 max-w-prose">
-              This is the notification the app actually sends, generated by the
-              same template that builds every push. The recall is the pre-cooked
-              pasta listeria case below, on the day its notice published.
+            <Paragraph className="mb-8">
+              This is an example of a notification the app actually sends. The
+              recall is the pre-cooked pasta listeria case below, on the day its
+              notice published.
             </Paragraph>
 
             <ol className="flex flex-col gap-8">
@@ -502,58 +552,101 @@ const RecallGuard = () => {
       <Section
         eyebrow="Why it matters"
         title="The system that catches this is getting smaller."
+        wideHeader
       >
-        <Paragraph className="mb-10 max-w-prose">
-          The number of recalls barely moved: 296 in 2024, 320 in 2025. What
-          changed is how many people are watching, and how large a single recall
-          has become.
-        </Paragraph>
+        {/* A breakout DIV, not a breakout Paragraph. The div spans the band and
+            left-aligns to the tile grid below; the descendant measure rule caps
+            the text inside it. Putting `breakout` on the Paragraph itself would
+            widen the text to 1088px, which is ~140 characters a line. */}
+        <div className="breakout mb-10">
+          <Paragraph>
+            The number of recalls barely moved: 296 in 2024, 320 in 2025. What
+            changed is how many people are watching, and how large a single
+            recall has become.
+          </Paragraph>
+        </div>
 
-        {/* Same flex-col-reverse pairing as the outbreak toll further down: the
-            label is the dt and the figure the dd, so a screen reader gets
-            "FDA investigators, 432" while the column still paints the number
-            above its label. */}
-        <dl className="grid gap-x-12 gap-y-8 sm:grid-cols-3">
+        {/* A 2x2, not a 3-across row with a lone before/after stranded under
+            it. Four figures making one argument should read as one block; the
+            old layout made the USDA volume look like a separate exhibit that
+            happened to follow, and left the row's third column short.
+
+            All four tiles get identical treatment even though the USDA figure
+            is a change-over-time and the other three are single magnitudes.
+            The comparison survives in that tile's meta line ("up from ~1.5M"),
+            which costs an arrow and buys a grid that reads as one system.
+
+            flex-col-reverse keeps the dt before the dd in the DOM while
+            painting the figure above its label, so a screen reader still gets
+            "FDA investigators, 432" in that order. Same pairing as the outbreak
+            toll further down.
+
+            No colour on any figure. The severity ramp is reserved for
+            classification state; these are capacity and volume, and tinting
+            them would spend the page's one hue on the wrong thing. */}
+        <dl className="breakout grid gap-x-12 gap-y-10 sm:grid-cols-2">
           {CAPACITY_FIGURES.map((item) => (
-            <div key={item.label} className="flex flex-col-reverse">
-              <dt className="mt-2 text-[0.95rem] leading-snug text-graphite">
+            <div
+              key={item.label}
+              className="rule-top flex flex-col-reverse pt-5"
+            >
+              <dt className="mt-2 max-w-[24rem] text-[0.95rem] leading-snug text-graphite">
                 {item.label}
+                {item.meta ? (
+                  <span className="mt-1 block font-Inter text-xs uppercase tracking-[0.16em] text-graphite/80">
+                    {item.meta}
+                  </span>
+                ) : null}
               </dt>
-              <dd className="font-Fraunces text-4xl text-ink sm:text-5xl">
+              <dd className="font-Fraunces text-4xl leading-none text-ink sm:text-5xl">
                 {item.figure}
+                {item.of ? (
+                  <span className="text-2xl text-graphite sm:text-3xl">
+                    {/* The slash is decorative; assistive tech gets the word,
+                        so the figure reads "432 of 1,500" rather than
+                        "432 slash 1,500" or, worse, "432 1,500". */}
+                    <span aria-hidden="true"> / </span>
+                    <span className="sr-only"> of </span>
+                    {item.of}
+                  </span>
+                ) : null}
               </dd>
             </div>
           ))}
         </dl>
 
-        <Paragraph className="mt-10 max-w-prose">
-          The FDA's own internal estimate is that it needs about 1,500
-          investigators. It has not met the domestic inspection targets Congress
-          set for it since 2018, and it names understaffing as its greatest
-          barrier to getting there. Foreign inspections last year ran at their
-          lowest level since 2011, outside the pandemic.
-        </Paragraph>
+        {/* Two columns, mirroring the 2x2 above, and it is a measure problem
+            rather than a taste one.
 
-        {/* The one before/after left on the page, and the only trend figure
-            that is both current and still pointing the right way. */}
-        <div className="mt-12 max-w-sm">
-          <Stat
-            from={USDA_VOLUME.from}
-            to={USDA_VOLUME.to}
-            label={USDA_VOLUME.label}
-            period={USDA_VOLUME.period}
-          />
+            These are body copy, so each has to stay near 70 characters a line —
+            at the full 1088px container they run about 106, which is the thing
+            the width pass existed to remove. But a lone 528px paragraph sitting
+            under a 1088px grid reads as stranded rather than deliberate.
+
+            Side by side, the block spans the full container like the tiles do,
+            while each column lands at ~520px and keeps the measure. The split
+            is also editorially right: the left column is the commentary on the
+            three FDA tiles, the right on the USDA one.
+
+            Do NOT "fix" this by removing the caps and letting the text span the
+            container. That is the bug, not the fix. */}
+        <div className="breakout mt-12 grid gap-x-12 gap-y-6 sm:grid-cols-2">
+          <Paragraph>
+            The agency has not met the domestic inspection targets Congress set
+            for it since 2018, and it names understaffing as its greatest
+            barrier to getting there.
+          </Paragraph>
+
+          <Paragraph>
+            That USDA figure is nine recalls against twenty-four the year
+            before. Fewer actions, each one vastly larger, and the odds that a
+            single recall touches something in your kitchen rise with its size.
+          </Paragraph>
         </div>
-
-        <Paragraph className="mt-8 max-w-prose">
-          Nine recalls, against twenty-four the year before. Fewer actions, each
-          one vastly larger, and the odds that a single recall touches something
-          in your kitchen rise with its size.
-        </Paragraph>
 
         {/* Same card treatment as "What's covered" further down the page, so the
             two read as the same kind of aside rather than two inventions. */}
-        <div className="mt-12 rounded-2xl border border-line bg-paper-sunk p-6 sm:p-8">
+        <div className="breakout mt-12 rounded-2xl border border-line bg-paper-sunk p-6 sm:p-8">
           <div className="grid gap-6 sm:grid-cols-[auto_1fr] sm:items-start sm:gap-10">
             {/* aria-hidden because the sentence beside it already says "60
                 percent" — without this a screen reader reads the figure twice.
@@ -582,8 +675,20 @@ const RecallGuard = () => {
 
         {/* graphite/80 rather than the /60 used for eyebrows. These lines are
             what substantiate every figure above them, so they have to clear AA
-            contrast — fine print is still print. */}
-        <p className="mt-8 text-xs leading-relaxed text-graphite/80">
+            contrast — fine print is still print.
+
+            DELIBERATELY UNCAPPED, and the only text on the page that is. The
+            measure rule governs prose you READ line after line; a citation
+            string is SCANNED, semicolon to semicolon, the way a photo credit
+            is. At the 26rem fine cap this wrapped to four lines of tiny type
+            and read as a paragraph; across the container it is two lines and
+            reads as a credit strip under the block it belongs to.
+            
+            The test for anything else claiming this exemption: would a reader
+            ever start at the left edge and read it through? If yes, it takes
+            the cap. The two graphite (not graphite/80) fine-print lines in the
+            chain section are prose and keep theirs. */}
+        <p className="breakout mt-8 text-xs leading-relaxed text-graphite/80">
           Sources: US GAO, GAO-25-107571; OPM figures via FoodNavigator;
           ProPublica on FDA foreign inspections; Food Processing on Sedgwick
           Recall Index data, first half 2026; US PIRG Education Fund, Food for
@@ -617,7 +722,7 @@ const RecallGuard = () => {
              past the recall and well beyond listeria's ~70-day incubation, so
              the late cases are genuinely post-recall. Say "still getting sick,"
              never a specific onset date we don't have. */}
-        <div className="mt-16 rounded-2xl border border-line px-6 py-10 sm:px-10 sm:py-12">
+        <div className="breakout mt-16 rounded-2xl border border-line px-6 py-10 sm:px-10 sm:py-12">
           <p className="mb-5 font-Inter text-eyebrow uppercase text-graphite/60">
             After the notice
           </p>
@@ -625,11 +730,11 @@ const RecallGuard = () => {
               so its heading sat level with every other section heading. Folding
               it into "Why it matters" — which does render an h2 — made it a
               subsection, and the markup has to say so. */}
-          <h3 className="mb-6 max-w-prose text-balance font-Fraunces text-2xl font-normal leading-tight text-ink sm:text-3xl">
+          <h3 className="mb-6 text-balance font-Fraunces text-2xl font-normal leading-tight text-ink sm:text-3xl">
             The recall published in June 2025. People were still getting sick in
             November.
           </h3>
-          <Paragraph className="mb-10 max-w-prose">
+          <Paragraph className="mb-10">
             Listeria in pre-cooked pasta, sold as prepared chicken fettuccine
             alfredo at Walmart and Kroger. Seventeen people had been identified
             when the recall went out. The count did not stop there.
@@ -649,7 +754,19 @@ const RecallGuard = () => {
               ("dead, 7"), while the reversed column still paints the number
               above its label. Hiding a duplicate <dt> instead would announce
               every label twice. */}
-          <dl className="rule-top flex flex-wrap gap-x-12 gap-y-6 pt-8">
+          {/* A grid, not a wrapping flex row. As a flex row these four sat in
+              416px of a 1006px container and left 590px of dead space to the
+              right — the numbers read as a left-clustered fragment rather than
+              as the toll of one event. Four equal columns make them a unit.
+
+              Two columns below sm, because "One / pregnancy lost" needs room to
+              wrap without stranding a word.
+
+              No colour on the figures, deliberately. The severity ramp is
+              reserved for classification state; these are outcomes, and a red
+              "7 dead" would be the page raising its voice at the one place the
+              facts do not need help. */}
+          <dl className="rule-top grid grid-cols-2 gap-x-8 gap-y-7 pt-8 sm:grid-cols-4">
             {OUTBREAK_TOLL.map((item) => (
               <div key={item.label} className="flex flex-col-reverse">
                 <dt className="mt-1 text-[0.95rem] text-graphite">
@@ -664,7 +781,7 @@ const RecallGuard = () => {
 
           {/* The thesis of the whole page, and the one sentence that has to
               survive any future edit. */}
-          <Paragraph className="mt-10 max-w-prose">
+          <Paragraph className="mt-10">
             The notice was public that entire time. It was posted to a
             government feed, picked up for a day, and never reached the people
             with the food already in their refrigerator. Published is not the
@@ -698,19 +815,35 @@ const RecallGuard = () => {
       <Section
         eyebrow="Why nobody called"
         title="The rules stop one step short of you"
-        width="prose"
+        wideHeader
       >
-        <Paragraph className="mb-10">
-          A recall is a relay, and most of it is compulsory. The product really
-          does come off the shelf. Here is every handoff the system is actually
-          obliged to make, and the one it isn't.
-        </Paragraph>
+        {/* Breakout so the intro anchors to the same left edge as the diagram
+            below it rather than sitting indented in the reading column. The
+            section reads as one exhibit with a header, not as a paragraph that
+            happens to precede a picture. Capped so the measure survives the
+            wider band. */}
+        <div className="breakout mb-10">
+          <Paragraph>
+            A recall is a relay, and most of it is compulsory. The product
+            really does come off the shelf. Here is every handoff the system is
+            actually obliged to make, and the one it isn't.
+          </Paragraph>
+        </div>
 
         {/* Arrows are decorative and hidden from assistive tech; the ordered
             lists carry the sequence on their own, and the two group headings
             say which half is required. A screen reader gets "What the rules
             require: 1, 2, 3. What nothing requires: 1." */}
-        <figure className="m-0">
+        {/* The cap moved here from the Section on 2026-08-24. This section
+            used to be the page's only narrow one, which is what made the
+            container snap 1088 -> 672 -> 1088 mid-scroll. The diagram is the
+            thing that actually needs a bound — three equal boxes stretched
+            across 1088px stop reading as a tight relay — so it carries the
+            bound itself and the shell matches every other section.
+
+            42rem, not the narrowed 33rem prose token: this is a diagram, not
+            copy, and the boxes need more room than a line of text does. */}
+        <figure className="breakout m-0 !max-w-[42rem]">
           <p
             id="chain-required"
             className="mb-4 font-Inter text-xs uppercase tracking-[0.16em] text-graphite/80"
@@ -772,9 +905,13 @@ const RecallGuard = () => {
             />
           </div>
 
+          {/* This half centres while the required chain above stays left. The
+              asymmetry is the argument: the compelled steps march across the
+              band, then the one nobody owes you sits alone in the middle with
+              space either side. */}
           <p
             id="chain-absent"
-            className="mb-4 font-Inter text-xs uppercase tracking-[0.16em] text-graphite/80"
+            className="mx-auto mb-4 text-center font-Inter text-xs uppercase tracking-[0.16em] text-graphite/80"
           >
             What nothing requires
           </p>
@@ -783,7 +920,7 @@ const RecallGuard = () => {
               could never render. Restore it if the group ever grows back. */}
           <ol
             aria-labelledby="chain-absent"
-            className="flex flex-col gap-3 sm:flex-row sm:items-stretch"
+            className="mx-auto flex max-w-sm flex-col gap-3 sm:flex-row sm:items-stretch"
           >
             {CHAIN_ABSENT.map((step) => (
               <li
@@ -802,14 +939,14 @@ const RecallGuard = () => {
               knows the exception discounts the whole diagram if it pretends the
               exception doesn't exist. Naming it and then naming its limits is
               what makes the paragraph below land. */}
-          <p className="mt-4 text-xs leading-relaxed text-graphite">
+          <p className="mx-auto mt-4 max-w-[34rem] text-center text-xs leading-relaxed text-graphite">
             A few chains do write to buyers off loyalty or membership records.
             It is voluntary, it only reaches you if you used the card at that
             chain, and PIRG graded 22 of the 26 largest US chains as failing on
             recall communication.
           </p>
 
-          <figcaption className="mt-8 text-[0.95rem] leading-relaxed text-graphite">
+          <figcaption className="mx-auto mt-8 max-w-[34rem] text-center text-[0.95rem] leading-relaxed text-graphite">
             So the food leaves the shelf and the notice sits in a federal feed,
             correct and public and unread. Neither of those reaches the box
             already in your cupboard. Someone has to go and get that notice, and
@@ -817,7 +954,7 @@ const RecallGuard = () => {
           </figcaption>
         </figure>
 
-        <p className="mt-8 text-xs leading-relaxed text-graphite/80">
+        <p className="breakout mt-8 text-xs leading-relaxed text-graphite/80">
           21 CFR 117.139 (recall plan requirements); FDA statement, January
           2025; US PIRG Education Fund, Food for Thought 2026 and Food Recall
           Failure (2020) for the supermarket grades.
@@ -860,8 +997,9 @@ const RecallGuard = () => {
       <Section
         eyebrow="In your kitchen"
         title="Everything else is either noise or silence"
+        wideHeader
       >
-        <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+        <div className="breakout grid gap-10 lg:grid-cols-2 lg:gap-16">
           <div className="space-y-5">
             <Paragraph>
               There are other ways to hear about a recall. A mailing list will
@@ -921,7 +1059,7 @@ const RecallGuard = () => {
 
         {/* Two columns, not three — four features in a 3-col grid orphans the
             last one. 2x2 balances and leaves the copy readable. */}
-        <div className="mt-16 grid gap-x-12 gap-y-10 sm:grid-cols-2">
+        <div className="breakout mt-16 grid gap-x-12 gap-y-10 sm:grid-cols-2">
           {FEATURES.map((feature) => (
             <div key={feature.title}>
               <div className="mb-5 h-px w-10 bg-rg" aria-hidden="true" />
@@ -937,7 +1075,7 @@ const RecallGuard = () => {
             food) and USDA FSIS (meat, poultry, egg) — see poll-fda-recalls and
             poll-fsis-recalls. Poll cadence is stated honestly here because
             claims.md bans real-time phrasing. */}
-        <div className="mt-12 rounded-2xl border border-line bg-paper-sunk p-6 sm:p-8">
+        <div className="breakout mt-12 rounded-2xl border border-line bg-paper-sunk p-6 sm:p-8">
           <h3 className="mb-3 font-Fraunces text-lg text-ink">
             What's covered
           </h3>
@@ -963,12 +1101,28 @@ const RecallGuard = () => {
       <Section
         eyebrow="What gets through"
         title="A technicality never wakes you up."
+        wideHeader
       >
-        <Paragraph className="mb-8 max-w-prose">
-          And a genuine hazard never gets buried.
-        </Paragraph>
+        <div className="breakout mb-6">
+          <Paragraph>And a genuine hazard never gets buried.</Paragraph>
+        </div>
 
-        <div className="overflow-x-auto">
+        {/* The announcement-day story. A recall is public well before the FDA
+            grades it, and the app has read the announcement feed since
+            2026-08-21 rather than waiting for the classification, so this table
+            has four rows where the FDA only has three classes. Saying that out
+            loud is the point: it is the coverage no competitor has, and the
+            hedge is what makes claiming it honest. */}
+        <div className="breakout mb-10">
+          <Paragraph>
+            A recall is public before it is graded, and the grade can take
+            weeks. RecallGuard reads the announcements the day they publish
+            rather than waiting, which is why there is a fourth row below that
+            the FDA does not have.
+          </Paragraph>
+        </div>
+
+        <div className="breakout overflow-x-auto">
           <table className="w-full min-w-[34rem] border-collapse text-left">
             <thead>
               <tr className="rule-bottom">
@@ -987,7 +1141,32 @@ const RecallGuard = () => {
               {SEVERITY_TIERS.map((row) => (
                 <tr key={row.tier} className="rule-bottom align-top">
                   <td className="py-4 pr-6 font-Fraunces text-base text-ink">
-                    {row.tier}
+                    <span className="flex items-center gap-3">
+                      {/* Hue is danger, fill is certainty — the app's own rule,
+                          reproduced rather than approximated. Solid for a grade
+                          the FDA gave, a 45-degree hatch for one we inferred.
+                          The app draws its hatch in SVG because it is inside a
+                          6px React Native stripe; a repeating-linear-gradient
+                          gets the same read on the web with no markup.
+
+                          aria-hidden because the tier name sits right beside it
+                          and the pending row says "Published, not graded yet"
+                          in the next column. The swatch is emphasis, never the
+                          only carrier of the distinction. */}
+                      <span
+                        aria-hidden="true"
+                        className="h-7 w-[6px] flex-none rounded-full"
+                        style={
+                          row.pending
+                            ? {
+                                backgroundImage: `repeating-linear-gradient(45deg, var(--sev) 0 3px, transparent 3px 8px)`,
+                                ["--sev"]: SEVERITY_HEX[row.severity],
+                              }
+                            : { background: SEVERITY_HEX[row.severity] }
+                        }
+                      />
+                      {row.tier}
+                    </span>
                   </td>
                   <td className="py-4 pr-6 text-[0.95rem] text-graphite">
                     {row.meaning}
@@ -1002,47 +1181,88 @@ const RecallGuard = () => {
         </div>
       </Section>
 
-      <Section eyebrow="Pricing" title="One subscription, no free tier">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-16">
-          <div className="rounded-2xl border border-line bg-white/60 p-8">
-            {/* The billing-term line is deliberately full-strength `text-graphite`
-                rather than the `graphite/70` used for supporting copy elsewhere on
-                this page. Fading it is what turns a monthly-first price into the
-                pattern this framing is careful not to be: the anchor may be the
-                big number, but the term and the annual total have to read as
-                first-class text, not as a disclaimer. Don't "tidy" this to /70. */}
-            <p className="mb-1 font-Fraunces text-4xl text-ink">$4.00/mo</p>
-            <p className="mb-6 text-sm text-graphite">
-              Billed annually at $48/year, after a 14-day free trial
-            </p>
-            <List
-              items={[
-                "Personalized recall feed for your state and allergens",
-                "Automatic pantry matching by product code",
-                "Receipt photo scanning",
-                "Priority push for your tracked allergens",
-                "Severity-tiered delivery",
-                "Optional weekly digest email, off by default",
-                "No ads, no trackers, no data sold",
-              ]}
-            />
-          </div>
+      {/* Centered, and no longer a two-column grid. The card sat in a 22rem
+          column beside a 1fr column holding a single sentence, so most of the
+          section was empty space pretending to be a layout. Centring makes the
+          price the focal object it should be, and matches the closing CTA
+          below, which is the only other centred block on the page.
 
-          {/* Two argument paragraphs used to sit here: why there's no free tier,
-              and a pointer to the FDA's free email list. The first moved to the
-              FAQ so it isn't making its case while the reader is looking at the
-              price. The second was cut entirely on 2026-08-12. Keep this space
-              for what the subscription buys, never for what it costs us. */}
-          <div className="space-y-5">
-            <Paragraph>
-              Billing is handled by Apple. Cancel anytime from iOS Settings.
-            </Paragraph>
-          </div>
+          text-center on the Section carries to the eyebrow and title, which is
+          the intent. The feature list opts back out with text-left — centred
+          bullets read as a poem, and these are specifications. */}
+      <Section
+        eyebrow="Pricing"
+        title="One subscription, no free tier"
+        className="text-center"
+      >
+        <div className="mx-auto w-full max-w-[24rem] rounded-2xl border border-line bg-white/60 p-8">
+          {/* The billing-term line is deliberately full-strength `text-graphite`
+              rather than the `graphite/70` used for supporting copy elsewhere on
+              this page. Fading it is what turns a monthly-first price into the
+              pattern this framing is careful not to be: the anchor may be the
+              big number, but the term and the annual total have to read as
+              first-class text, not as a disclaimer. Don't "tidy" this to /70. */}
+          <p className="mb-1 font-Fraunces text-4xl text-ink">$4.00/mo</p>
+          <p className="mb-6 text-sm text-graphite">
+            Billed annually at $48/year, after a 14-day free trial
+          </p>
+          <List
+            className="text-left"
+            items={[
+              "Personalized recall feed for your state and allergens",
+              "Automatic pantry matching by product code",
+              "Receipt photo scanning",
+              "Priority push for your tracked allergens",
+              "Severity-tiered delivery",
+              "Optional weekly digest email, off by default",
+              "No ads, no trackers, no data sold",
+            ]}
+          />
         </div>
+
+        {/* This used to be a second column. Two argument paragraphs sat there
+            once — why there's no free tier, and a pointer to the FDA's free
+            email list. The first moved to the FAQ so it isn't making its case
+            while the reader is looking at the price. The second was cut on
+            2026-08-12. If anything comes back here, it is what the subscription
+            buys, never what it costs us. */}
+        <Paragraph className="mt-6">
+          Billing is handled by Apple. Cancel anytime from iOS Settings.
+        </Paragraph>
       </Section>
 
       {/* FAQ */}
-      <Section eyebrow="Questions" title="Frequently asked" width="prose">
+      {/* Closing CTA, and it sits ABOVE the FAQ deliberately. The waitlist is
+          the page's only action pre-launch, and burying it under six accordion
+          rows meant a reader who was already convinced had to scroll past the
+          ask to find it. The FAQ is reference material for the people who are
+          not convinced yet, so it reads better as the thing after the ask than
+          as the thing in front of it.
+
+          pt-0 came off with the move: it existed to make this hang off the FAQ
+          as a continuation, and against Pricing it would just collide. */}
+      {!product.appStoreUrl && (
+        <Section>
+          <div className="breakout rounded-2xl border border-line bg-rg-wash px-6 py-12 text-center sm:px-12">
+            <h2 className="mb-3 font-Fraunces text-2xl font-normal text-ink sm:text-3xl">
+              Know before you eat it
+            </h2>
+            <p className="mx-auto mb-8 text-graphite">
+              RecallGuard launches on iPhone soon. Leave your email and we'll
+              tell you the day it's live.
+            </p>
+            <WaitlistForm id="footer" className="mx-auto max-w-md text-left" />
+          </div>
+        </Section>
+      )}
+
+      {/* Last section on the page now, which suits it: the legal and support
+          links at the end were always footer-shaped, and they land where a
+          reader expects to find them rather than mid-scroll. */}
+      <Section eyebrow="Questions" title="Frequently asked">
+        {/* Capped here rather than on the Section, same reason as the chain
+            diagram above: the answers are body copy and want the measure, but
+            the shell should not narrow just because its contents do. */}
         <div className="rule-top">
           {FAQS.map((faq) => (
             <FaqItem
@@ -1074,23 +1294,6 @@ const RecallGuard = () => {
           </Link>
         </div>
       </Section>
-
-      {/* Closing CTA — the action exists at both ends of the scroll, since a
-          reader who went through the FAQ shouldn't have to travel back up. */}
-      {!product.appStoreUrl && (
-        <Section className="pt-0">
-          <div className="rounded-2xl border border-line bg-rg-wash px-6 py-12 text-center sm:px-12">
-            <h2 className="mb-3 font-Fraunces text-2xl font-normal text-ink sm:text-3xl">
-              Know before you eat it
-            </h2>
-            <p className="mx-auto mb-8 max-w-prose text-graphite">
-              RecallGuard launches on iPhone soon. Leave your email and we'll
-              tell you the day it's live.
-            </p>
-            <WaitlistForm id="footer" className="mx-auto max-w-md text-left" />
-          </div>
-        </Section>
-      )}
     </div>
   );
 };
