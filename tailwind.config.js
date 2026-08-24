@@ -31,7 +31,19 @@ export default {
         gutter: "clamp(1.5rem, 5vw, 6rem)",
       },
       maxWidth: {
-        prose: "42rem",
+        // 33rem, down from 42rem on 2026-08-24. At the 0.95rem body size these
+        // pages actually use, 42rem measured 89 characters a line — well past
+        // the 65-75 where the eye reliably finds the next line without
+        // re-reading. 33rem lands near 70.
+        //
+        // This is the one token that fixes every capped paragraph on the site
+        // at once, legal pages included, where a long measure is worse rather
+        // than better. Seven files consume it.
+        //
+        // If you widen it again, widen the type with it. The two are a pair:
+        // measure is a character count, not a pixel count, so a wider column is
+        // only legible if the characters got wider too.
+        prose: "33rem",
         content: "68rem",
       },
       transitionTimingFunction: {
@@ -52,6 +64,19 @@ export default {
           DEFAULT: "#204efa",
           deep: "#1a3fd0",
           wash: "#EEF2FF",
+        },
+
+        // RecallGuard's severity ramp, mirrored from the app so the marketing
+        // page and the product agree on what each class looks like. Source of
+        // truth is recall-guard/tailwind.config.js `colors.sev`; keep in sync.
+        //
+        // sev-2 is a deep amber rather than an orange on purpose: in the app it
+        // sits in a 6px stripe where orange was not reliably distinguishable
+        // from Class I red.
+        sev: {
+          3: "#c8102e", // Class I — serious risk
+          2: "#a8630a", // Class II — possible risk
+          1: "#57574f", // Class III — minor issue
         },
       },
     },
