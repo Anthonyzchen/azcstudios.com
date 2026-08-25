@@ -853,7 +853,7 @@ const RecallGuard = () => {
               survive any future edit. */}
           <Paragraph className="mt-10">
             The notice was public that entire time. It was posted to a
-            government feed, picked up for a day, and never reached the people
+            government feed and picked up for a day. It never reaches the people
             with the food already in their refrigerator. Published is not the
             same as told.
           </Paragraph>
