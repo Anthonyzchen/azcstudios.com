@@ -343,7 +343,7 @@ const FAQS = [
     // review — without leading with the absence.
     question: "What does the subscription cover?",
     answer:
-      "There is a 14-day free trial, then it's $4.00 a month billed annually, with no free tier after that. You're paying for the work: three government feeds pulled on a schedule, cleaned into a consistent shape, and checked against what's actually in your kitchen. The alternative is doing that yourself, every week, forever.",
+      "There is a 14-day free trial, then it's $4.00 a month billed annually, with no free tier after that. You're paying for the work: three government feeds pulled on a schedule, cleaned into a consistent shape, and checked against what's actually in your pantry. The alternative is doing that yourself, every week, forever.",
   },
   {
     // Carries the allergen and household detail cut from the feature grid.
@@ -402,11 +402,21 @@ const RecallGuard = () => {
                 copy lives in the vault at
                 Projects/RecallGuard/landing-page-copy.md. */}
             {/* text-balance rather than a hard <br>: at this measure the
-                headline otherwise orphans "kitchen." onto a third line, and a
-                manual break would land in the wrong place once the fluid type
-                scale shrinks on narrow screens. */}
+                headline otherwise orphans its last word onto a third line, and
+                a manual break would land in the wrong place once the fluid type
+                scale shrinks on narrow screens. (Was "kitchen." until
+                2026-08-24 — see the terminology note below.) */}
+            {/* "pantry", not "kitchen", throughout this page as of 2026-08-24.
+                The page used both: pantry for the feature, kitchen for the
+                physical place. Anthony's call to collapse them onto the product
+                noun, so the words a reader sees match the Pantry tab in the
+                screenshots and in the app. The remaining "kitchen" mentions in
+                this file are all inside comments recording earlier decisions
+                and are left as written — rewriting the record of why a line
+                reads the way it does destroys the reasoning, which is the part
+                a future editor actually needs. */}
             <h1 className="mb-6 text-balance font-Fraunces text-display-sm font-normal text-ink">
-              The recall happens after the food is in your kitchen.
+              The recall happens after the food is in your pantry.
             </h1>
 
             {/* "household" on purpose. The old version enumerated allergens,
@@ -656,7 +666,7 @@ const RecallGuard = () => {
           <Paragraph>
             That USDA figure is nine recalls against twenty-four the year
             before. Fewer actions, each one vastly larger, and the odds that a
-            single recall touches something in your kitchen rise with its size.
+            single recall touches something in your pantry rise with its size.
           </Paragraph>
         </div>
 
@@ -681,7 +691,7 @@ const RecallGuard = () => {
               </Paragraph>
               <Paragraph>
                 No named product means no recall, which means there is nothing
-                for you to check your kitchen against. The recalls that do get
+                for you to check your pantry against. The recalls that do get
                 named are the ones you can still act on, and most people never
                 hear about those either.
               </Paragraph>
@@ -966,7 +976,7 @@ const RecallGuard = () => {
             So the food leaves the shelf and the notice sits in a federal feed,
             correct and public and unread. Neither of those reaches the box
             already in your cupboard. Someone has to go and get that notice, and
-            check it against your kitchen.
+            check it against your pantry.
           </figcaption>
         </figure>
 
@@ -1011,7 +1021,7 @@ const RecallGuard = () => {
           which do tell you say too much to be heard. Do not reintroduce the
           "in my kitchen" phrasing here. */}
       <Section
-        eyebrow="In your kitchen"
+        eyebrow="In your pantry"
         title="Everything else is either noise or silence"
         wideHeader
       >
@@ -1037,7 +1047,7 @@ const RecallGuard = () => {
               is a habit of dismissal, and you build that habit on the 49 that
               never mattered. So you say what matters instead, and the app
               filters the FDA and USDA streams down to the recalls that could
-              plausibly reach your kitchen.
+              plausibly reach your pantry.
             </Paragraph>
           </div>
           {/* Editorial photo, not a product shot. These run as atmosphere
