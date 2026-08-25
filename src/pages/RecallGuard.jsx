@@ -390,7 +390,7 @@ const RecallGuard = () => {
             column keeps enough gutter for the annotation chips to sit beside
             the phone instead of on top of it. See the arithmetic in the comment
             above that box before changing either number. */}
-        <div className="mx-auto grid max-w-content items-center gap-12 xl:max-w-[80rem] xl:grid-cols-[minmax(0,27rem)_1fr] xl:gap-16">
+        <div className="mx-auto grid max-w-content items-center gap-12 xl:grid-cols-[minmax(0,27rem)_1fr] xl:gap-16">
           <div>
             <div className="mb-8 flex items-center gap-3">
               <span
@@ -500,10 +500,10 @@ const RecallGuard = () => {
               at its full size across the whole mid range; the cost is roughly
               400px of extra hero height in that band, taken deliberately.
 
-              80rem at xl for the same reason: 27rem of copy plus a 4rem gap
-              plus the ~700px the phone and its chips need does not fit inside
-              68rem. The hero is the one section that earns the wider band —
-              everything below it is reading copy and stays at 68rem.
+              The band stays at 68rem. At xl that leaves the phone side
+              exactly 592px (1088 - 27rem copy - 4rem gap), which is the
+              container's cap — so the phone renders at its full 300px there
+              without the hero needing a wider band than the rest of the page.
 
           */}
           {/* The product, in the first screen. This used to be the editorial
@@ -946,9 +946,9 @@ const RecallGuard = () => {
             wider band. */}
         <div className="breakout mb-10 [&_p]:mx-auto">
           <Paragraph>
-            A recall is a relay, and most of it is compulsory. The product
-            really does come off the shelf. Here is every handoff the system is
-            actually obliged to make, and the one it isn't.
+            A recall is a relay, and the products come off the shelf. Here is
+            every handoff the system is actually obliged to make, and the one it
+            isn't.
           </Paragraph>
         </div>
 
@@ -1077,12 +1077,13 @@ const RecallGuard = () => {
             recall communication.
           </p>
 
-          <figcaption className="mx-auto mt-8 max-w-[34rem] text-center text-[0.95rem] leading-relaxed text-graphite">
-            So the food leaves the shelf and the notice sits in a federal feed,
-            correct and public and unread. Neither of those reaches the box
-            already in your cupboard. Someone has to go and get that notice, and
-            check it against your pantry.
-          </figcaption>
+          {/* No figcaption. It used to close with "So the food leaves the shelf
+              and the notice sits in a federal feed..." — cut 2026-08-25 because
+              the diagram had already said it: the required chain ends at the
+              stores, the one row nobody owes you sits alone below the break,
+              and restating that in prose only softened it. A <figure> without a
+              <figcaption> is valid, and the two <ol>s carry their own names via
+              aria-labelledby, so nothing was load-bearing here. */}
         </figure>
 
         <p className="breakout mt-8 text-xs leading-relaxed text-graphite/80">

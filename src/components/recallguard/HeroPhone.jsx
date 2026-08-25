@@ -32,21 +32,24 @@ import feedScreenshot from "../../assets/images/recallguard-feed.webp";
  * to drift apart — which is exactly what happened between the float breakpoint
  * and the matchMedia query.
  *
- *   container   w-full, capped at 44rem / 704px
- *   screenshot  calc(100% - 18rem) -> the container minus 288px
+ *   container   w-full, capped at 37rem / 592px
+ *   screenshot  min(300px, 100% - 18rem)
  *   chip        9.5rem / 152px
- *   gutter      144px a side, so a chip overlaps the frame by 8px
+ *   gutter      146px a side, so a chip overlaps the frame by 6px
  *
- * The screenshot is a calc, not a fixed width, so it GROWS into whatever room
- * the container has instead of being capped short of it. That was the bug this
- * replaced: a fixed 220px screenshot sitting inside an 884px grid at 982px
- * wide, throwing away 356px and rendering a phone barely half the size of a
- * real one. It now reaches 416px wherever the container hits its cap; a real
- * iPhone is 390.
+ * 300px IS THE NUMBER THE LOCK SCREEN RENDERS AT, and that is the whole reason
+ * for it. Two phones appear on this page a screen apart; at different sizes
+ * they read as two different devices rather than as one product photographed
+ * twice. If LockScreenPhone's frame width changes, change this with it.
  *
- * The cap and the calc are a pair. Raise the cap and the phone grows with it,
- * while the gutters stay at 144 — the chip width is fixed and the calc
- * subtracts a constant, so the geometry holds at every width in between.
+ * The min() matters below ~684px, where the container is narrower than
+ * 300 + 288 and a fixed 300 would push the chips off their gutters. There the
+ * screenshot gives way instead, and the gutters stay put.
+ *
+ * This replaced a fixed 220px screenshot that sat inside an 884px grid at 982px
+ * wide, throwing away 356px on a phone barely half the size of a real one. The
+ * fix was never "make it as big as possible" — 416px cleared the room and was
+ * then too big for the page it sits on.
  *
  * Below sm the chips do not float at all. 342px of usable width cannot hold a
  * legible screenshot AND a chip either side, so RecallGuard.jsx renders the
@@ -152,7 +155,7 @@ export const HeroPhone = ({ chips }) => {
   return (
     <div
       ref={scopeRef}
-      className="relative mx-auto w-full max-w-[300px] sm:max-w-[44rem]"
+      className="relative mx-auto w-full max-w-[300px] sm:max-w-[37rem]"
     >
       <img
         src={feedScreenshot}
@@ -162,7 +165,7 @@ export const HeroPhone = ({ chips }) => {
         loading="eager"
         onMouseEnter={() => setPhoneHovered(true)}
         onMouseLeave={() => setPhoneHovered(false)}
-        className="mx-auto w-full max-w-[300px] rounded-[1.75rem] border border-line shadow-sm sm:max-w-[calc(100%-18rem)]"
+        className="mx-auto w-full max-w-[300px] rounded-[1.75rem] border border-line shadow-sm sm:max-w-[min(300px,calc(100%-18rem))]"
       />
 
       {chips.map((chip) => (
