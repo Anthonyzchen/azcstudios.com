@@ -86,7 +86,7 @@ export const HeroPhone = ({ chips }) => {
                 // `|| 0` rather than a bare Number(): a chip added without a
                 // drift value would otherwise yield NaN, and GSAP writes a
                 // broken transform for it without complaining.
-                x: \(\) => {
+                x: () => {
                   const drift = Number(node.dataset.drift) || 0;
                   if (drift <= 0) return drift;
                   const box = scopeRef.current.getBoundingClientRect();
