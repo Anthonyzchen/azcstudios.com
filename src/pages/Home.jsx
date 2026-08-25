@@ -23,8 +23,20 @@ const ProductCard = ({ product }) => (
       </span>
     </div>
 
-    <p className="mb-4 text-lede text-ink/80">{product.tagline}</p>
-    <Paragraph className="mb-6">{product.summary}</Paragraph>
+    {/* Two columns from lg, because the card spans the full band and its text
+        does not. Both of these are <p>, so the measure rule inside .breakout
+        caps them at 33rem — correct for legibility, but stacked it left a
+        1088px card holding 510px of content and 578px of nothing, which is the
+        dead-space-on-the-right problem in miniature. Split across two ~456px
+        columns the band fills and neither line exceeds the measure, so the cap
+        never has to bite.
+
+        One column below lg: at that width the band is near the measure already
+        and two columns would just be two narrow ones. */}
+    <div className="mb-6 grid gap-x-12 gap-y-4 lg:grid-cols-2">
+      <p className="text-lede text-ink/80">{product.tagline}</p>
+      <Paragraph>{product.summary}</Paragraph>
+    </div>
 
     <span className="inline-flex items-center gap-2 text-sm font-medium text-ink">
       Read more
@@ -75,8 +87,19 @@ const Home = () => {
       </section>
 
       {/* Products */}
-      <Section eyebrow="Products" title="What we're building" id="products">
-        <div className="grid gap-6">
+      {/* breakout + wideHeader, because the exhibit here is the card stack and
+          a card is not reading text — it has its own internal measure, its own
+          padding and a hit area that wants to be the width of the band. Left in
+          the reading column it renders at 33rem, which is what shipped in
+          9ddf431 when Section's default flipped and this page was not updated
+          with it. */}
+      <Section
+        eyebrow="Products"
+        title="What we're building"
+        id="products"
+        wideHeader
+      >
+        <div className="breakout grid gap-6">
           {products.map((product) => (
             <ProductCard key={product.slug} product={product} />
           ))}
@@ -84,8 +107,13 @@ const Home = () => {
       </Section>
 
       {/* Approach */}
-      <Section eyebrow="Approach" title="How we work">
-        <div className="grid gap-10 sm:grid-cols-3">
+      {/* Same fix, and this one was the worse casualty: three columns inside a
+          33rem column gave each about 10rem, roughly 22 characters a line. The
+          measure rule inside .breakout still caps each Paragraph at prose, but
+          a third of the band is already narrower than that, so the cap never
+          bites and the columns simply read at their own width. */}
+      <Section eyebrow="Approach" title="How we work" wideHeader>
+        <div className="breakout grid gap-10 sm:grid-cols-3">
           <div>
             <h3 className="mb-3 font-Fraunces text-lg text-ink">
               Paid, not free

@@ -93,28 +93,28 @@ const HERO_CHIPS = [
     title: "Checked, not just listed",
     detail: "Your pantry against every active recall",
     side: "left",
-    position: "xl:left-0 xl:top-[6%]",
+    position: "sm:left-0 sm:top-[6%]",
     drift: -70,
   },
   {
     title: "Two feeds",
     detail: "Yours is filtered to your state. All is everything.",
     side: "right",
-    position: "xl:right-0 xl:top-[27%]",
+    position: "sm:right-0 sm:top-[27%]",
     drift: 80,
   },
   {
     title: "Severity in plain English",
     detail: "And it says so when the FDA hasn't rated it yet",
     side: "left",
-    position: "xl:left-0 xl:top-[50%]",
+    position: "sm:left-0 sm:top-[50%]",
     drift: -35,
   },
   {
     title: "Pet food too",
     detail: "The animal-food feed, flagged with a paw",
     side: "right",
-    position: "xl:right-0 xl:top-[72%]",
+    position: "sm:right-0 sm:top-[72%]",
     drift: 95,
   },
 ];
@@ -213,13 +213,15 @@ const CAPACITY_FIGURES = [
 ];
 
 // The toll is quoted from the CDC's final case count, not from the interim
+// CDC\'s FINAL counts, the outbreak having been declared over 2024-11-21. The
+// death count is not repeated here — the stat directly above carries it as
+// 2 -> 10.
 // numbers that circulated while the outbreak was open (an earlier report had
 // six deaths and 18 states).
 const OUTBREAK_TOLL = [
+  { figure: "61", label: "infected" },
+  { figure: "60", label: "hospitalized" },
   { figure: "19", label: "states" },
-  { figure: "27", label: "hospitalized" },
-  { figure: "7", label: "dead" },
-  { figure: "One", label: "pregnancy lost" },
 ];
 
 // The notification chain, drawn rather than described. The argument in this
@@ -322,7 +324,11 @@ const FAQS = [
   {
     question: "Where does the recall data come from?",
     answer:
-      "Two public government sources: the FDA, which covers most human food and animal food, and USDA FSIS, which covers meat, poultry, and egg products. RecallGuard reads both feeds on a schedule, extracts the product identifiers, and matches them against your profile and pantry. It does not republish, alter, or editorialize either agency's findings.",
+            // The second sentence is the same-day LIMIT, moved here on 2026-08-24
+      // when the "What's covered" card was cut. Keep it verbatim: it bounds the
+      // promise, claims.md bans real-time phrasing, and a limit is worth more
+      // words than a benefit. It was the only reason that card still existed.
+      "Two public government sources: the FDA, which covers most human food and animal food, and USDA FSIS, which covers meat, poultry, and egg products. Alerts land the same day the agency posts the recall, not the instant it happens: we poll the feeds on a schedule rather than claiming a real-time pipe we don't have. RecallGuard reads both feeds, extracts the product identifiers, and matches them against your profile and pantry. It does not republish, alter, or editorialize either agency's findings.",
   },
   {
     // Answers the objection without itemising costs. An earlier version broke
@@ -383,9 +389,9 @@ const RecallGuard = () => {
             column keeps enough gutter for the annotation chips to sit beside
             the phone instead of on top of it. See the arithmetic in the comment
             above that box before changing either number. */}
-        <div className="mx-auto grid max-w-content items-center gap-12 lg:grid-cols-[minmax(0,27rem)_1fr] lg:gap-16">
+        <div className="mx-auto grid max-w-content items-center gap-12 lg:grid-cols-[minmax(0,24rem)_1fr] xl:grid-cols-[minmax(0,27rem)_1fr] xl:gap-16">
           <div>
-            <div className="mb-6 flex items-center gap-3">
+            <div className="mb-8 flex items-center gap-3">
               <span
                 className="h-2.5 w-2.5 rounded-full bg-rg"
                 aria-hidden="true"
@@ -415,7 +421,7 @@ const RecallGuard = () => {
                 and are left as written — rewriting the record of why a line
                 reads the way it does destroys the reasoning, which is the part
                 a future editor actually needs. */}
-            <h1 className="mb-6 text-balance font-Fraunces text-display-sm font-normal text-ink">
+            <h1 className="mb-8 text-balance font-Fraunces text-display-sm font-normal text-ink">
               The recall happens after the food is in your pantry.
             </h1>
 
@@ -494,16 +500,23 @@ const RecallGuard = () => {
               worth nothing. */}
           <HeroPhone chips={HERO_CHIPS} />
 
-          {/* Same four annotations below the phone once there is no room to
-              float them. A grid rather than the absolute layout above: at this
-              width they are a caption, and a caption reads in order.
+          {/* The same four annotations as a caption, on phones only, where
+              there is no room to float them beside the screenshot. From sm up
+              HeroPhone positions them in the gutters and this is hidden.
 
-              lg:col-start-2 is required, not cosmetic. This is the third direct
-              child of a two-column grid, so it would otherwise flow to row two
-              column one — under the COPY rather than under the phone — across
-              the whole 1024-1279px band, which is exactly the band where it is
-              the visible version of the annotations. */}
-          <ul className="mx-auto grid w-full max-w-[420px] grid-cols-1 gap-2 sm:max-w-none sm:grid-cols-2 lg:col-start-2 xl:hidden">
+              One set of chips, not two: this list and the floating ones render
+              from the same HERO_CHIPS array, so the copy cannot drift between
+              breakpoints. Both are in the DOM at every width and one is display
+              hidden, which does mean a screen reader at sm+ reaches the
+              floating set rather than this one — fine, since they read
+              identically.
+
+              It no longer needs lg:col-start-2. That existed to stop this
+              landing under the COPY column across the 1024-1279 band, which was
+              the band where it was the visible version. That band now floats.
+              If this is ever un-hidden above sm again, the col-start comes back
+              with it. */}
+          <ul className="mx-auto grid w-full max-w-[420px] grid-cols-1 gap-2 sm:hidden">
             {HERO_CHIPS.map((chip) => (
               <li key={chip.title}>
                 <Chip title={chip.title} detail={chip.detail} />
@@ -538,7 +551,7 @@ const RecallGuard = () => {
           <div>
             <Paragraph className="mb-8">
               This is an example of a notification the app actually sends. The
-              recall is the pre-cooked pasta listeria case below, on the day its
+              recall is the deli-meat listeria case below, on the day its
               notice published.
             </Paragraph>
 
@@ -752,26 +765,57 @@ const RecallGuard = () => {
           <p className="mb-5 font-Inter text-eyebrow uppercase text-graphite/60">
             After the notice
           </p>
-          {/* h3, not h2. This card used to be its own Section with no title,
+        {/* THIS BLOCK ARGUES ONE THING AND MUST KEEP ARGUING IT: people kept
+            getting sick AFTER the recall was public. That is the gap RecallGuard
+            closes.
+
+            CASE CHOSEN 2026-08-24 over two larger candidates, and the reason is
+            the only thing that matters when picking a replacement:
+
+            THE TEST IS THE ONSET WINDOW, NOT THE CASE COUNT. Boar's Head illness
+            onsets ran late May to mid-September 2024 against a late-July recall —
+            roughly SEVEN WEEKS of new infections after the notice was public.
+            CDC only declares a listeria outbreak over 60 days past the last
+            illness, which is why the close came in November.
+
+            The Taylor Fresh lettuce cyclospora outbreak was tried here first and
+            pulled. Its numbers are far bigger (10,930 sick, 454 hospitalised) and
+            entirely accurate, but CDC puts its onsets at 22 June to 20 July
+            against a 17 July recall — THREE DAYS. Its rising count is reporting
+            lag, not new illness, so it argues the FDA's investigation lag, which
+            is the framing Anthony killed on 2026-08-14 because the product cannot
+            fix it. Bigger numbers, wrong argument. Do not reinstate it.
+
+            ACCURACY GUARDRAILS:
+            1. CDC declared this outbreak OVER on 2024-11-21, so these are final
+               figures, not a moving count. That is a feature: the page never goes
+               stale and never needs re-checking against a live investigation.
+            2. Two deaths were known at the recall, ten by the close. Say "eight
+               more died after", never that the later victims ate the meat in
+               defiance of the notice — the sources support the curve, not that.
+            3. Listeria incubates up to ~70 days, so do not pin any individual
+               death to a post-recall exposure. The claim is the ONSET WINDOW,
+               which is documented, and that is enough. */}}
+          {/*           {/* h3, not h2. This card used to be its own Section with no title,
               so its heading sat level with every other section heading. Folding
               it into "Why it matters" — which does render an h2 — made it a
               subsection, and the markup has to say so. */}
           <h3 className="mb-6 text-balance font-Fraunces text-2xl font-normal leading-tight text-ink sm:text-3xl">
-            The recall published in June 2025. People were still getting sick in
-            November.
+            The recall published in July. People were still getting sick in
+            September.
           </h3>
           <Paragraph className="mb-10">
-            Listeria in pre-cooked pasta, sold as prepared chicken fettuccine
-            alfredo at Walmart and Kroger. Seventeen people had been identified
-            when the recall went out. The count did not stop there.
+            Listeria in deli meat sliced at the counter, traced to one Boar\'s
+            Head plant in Jarratt, Virginia. Seven million pounds came off the
+            shelves. Two people had died when the recall went out.
           </Paragraph>
 
           <div className="mb-10 max-w-sm">
             <Stat
-              from="17"
-              to="28"
-              label="People infected, while a public recall notice existed the entire time"
-              period="At the June 2025 recall, to the final count"
+              from="2"
+              to="10"
+              label="People dead, while a public recall notice existed the entire time"
+              period="At the July 2024 recall, to the final count"
             />
           </div>
 
@@ -792,7 +836,7 @@ const RecallGuard = () => {
               reserved for classification state; these are outcomes, and a red
               "7 dead" would be the page raising its voice at the one place the
               facts do not need help. */}
-          <dl className="rule-top grid grid-cols-2 gap-x-8 gap-y-7 pt-8 sm:grid-cols-4">
+          <dl className="rule-top grid grid-cols-3 gap-x-8 gap-y-7 pt-8">
             {OUTBREAK_TOLL.map((item) => (
               <div key={item.label} className="flex flex-col-reverse">
                 <dt className="mt-1 text-[0.95rem] text-graphite">
@@ -809,14 +853,15 @@ const RecallGuard = () => {
               survive any future edit. */}
           <Paragraph className="mt-10">
             The notice was public that entire time. It was posted to a
-            government feed, picked up for a day, and never reached the people
+            government feed and picked up for a day. It never reaches the people
             with the food already in their refrigerator. Published is not the
             same as told.
           </Paragraph>
 
           <p className="mt-6 text-xs leading-relaxed text-graphite/80">
-            CDC, case counts as of June 18, 2025 and at the final update;
-            outbreak declared over February 2026.
+            CDC listeria outbreak investigation, deli meats, final update; USDA
+            FSIS recall notices, July 2024. Outbreak declared over 21 November
+            2024, so these are final counts.
           </p>
         </div>
       </Section>
@@ -1073,7 +1118,13 @@ const RecallGuard = () => {
             width="900"
             height="1350"
             loading="lazy"
-            className="mx-auto aspect-[4/5] w-full max-w-sm rounded-2xl object-cover"
+            // Pulled up to sit level with the section header rather than with
+            // the copy beside it, so the photo reads as part of the section
+            // opening instead of as something that starts late. 144px is the
+            // measured height of the eyebrow-plus-title block at lg; re-measure
+            // if either the eyebrow or the title\'s wrap changes. Only at lg —
+            // below that the grid stacks and the image follows the copy.
+            className="mx-auto aspect-[4/5] w-full max-w-sm rounded-2xl object-cover lg:-mt-36"
           />
         </div>
 
@@ -1088,49 +1139,13 @@ const RecallGuard = () => {
         <div className="breakout mt-16 grid gap-x-12 gap-y-10 sm:grid-cols-2">
           {FEATURES.map((feature) => (
             <div key={feature.title}>
-              <div className="mb-5 h-px w-10 bg-rg" aria-hidden="true" />
+              <div className="mb-4 h-px w-10 bg-rg" aria-hidden="true" />
               <h3 className="mb-3 font-Fraunces text-lg text-ink">
                 {feature.title}
               </h3>
               <Paragraph>{feature.body}</Paragraph>
             </div>
           ))}
-        </div>
-
-        {/* Coverage note. Both agencies are live sources: FDA (human + animal
-            food) and USDA FSIS (meat, poultry, egg) — see poll-fda-recalls and
-            poll-fsis-recalls. Poll cadence is stated honestly here because
-            claims.md bans real-time phrasing. */}
-        <div className="breakout mt-12 rounded-2xl border border-line bg-paper-sunk p-6 sm:p-8">
-          <h3 className="mb-3 font-Fraunces text-lg text-ink">
-            What's covered
-          </h3>
-          <Paragraph className="mb-4">
-            FDA and USDA FSIS both, so a beef recall and a cookie recall reach
-            you the same way.
-          </Paragraph>
-          {/* Keep this one verbatim. It limits the promise, and a limit is
-              worth more words than a benefit. */}
-          <Paragraph>
-            Alerts land the same day the agency posts the recall, not the
-            instant it happens. We poll the feeds on a schedule rather than
-            claiming a real-time pipe we don't have.
-          </Paragraph>
-        </div>
-      </Section>
-
-      {/* Alert behavior. Eyebrow names what the section decides ("what gets
-          through") rather than the feature it belongs to ("Alerts"), and the
-          title is the sharpest sentence the section already had — it was the
-          lede, doing headline work from one size down. Its other half stays
-          below as the paragraph, so nothing was cut to make room. */}
-      <Section
-        eyebrow="What gets through"
-        title="A technicality never wakes you up."
-        wideHeader
-      >
-        <div className="breakout mb-6">
-          <Paragraph>And a genuine hazard never gets buried.</Paragraph>
         </div>
 
         {/* The announcement-day story. A recall is public well before the FDA
@@ -1220,8 +1235,9 @@ const RecallGuard = () => {
         eyebrow="Pricing"
         title="One subscription, no free tier"
         className="text-center"
+      wideHeader
       >
-        <div className="mx-auto w-full max-w-[24rem] rounded-2xl border border-line bg-white/60 p-8">
+        <div className="breakout mx-auto w-full max-w-[24rem] rounded-2xl border border-line bg-white/60 p-8">
           {/* The billing-term line is deliberately full-strength `text-graphite`
               rather than the `graphite/70` used for supporting copy elsewhere on
               this page. Fading it is what turns a monthly-first price into the
@@ -1229,7 +1245,7 @@ const RecallGuard = () => {
               big number, but the term and the annual total have to read as
               first-class text, not as a disclaimer. Don't "tidy" this to /70. */}
           <p className="mb-1 font-Fraunces text-4xl text-ink">$4.00/mo</p>
-          <p className="mb-6 text-sm text-graphite">
+          <p className="mb-8 text-sm text-graphite">
             Billed annually at $48/year, after a 14-day free trial
           </p>
           <List
@@ -1285,11 +1301,11 @@ const RecallGuard = () => {
       {/* Last section on the page now, which suits it: the legal and support
           links at the end were always footer-shaped, and they land where a
           reader expects to find them rather than mid-scroll. */}
-      <Section eyebrow="Questions" title="Frequently asked">
+      <Section eyebrow="Questions" title="Frequently asked" wideHeader>
         {/* Capped here rather than on the Section, same reason as the chain
             diagram above: the answers are body copy and want the measure, but
             the shell should not narrow just because its contents do. */}
-        <div className="rule-top">
+        <div className="breakout rule-top">
           {FAQS.map((faq) => (
             <FaqItem
               key={faq.question}

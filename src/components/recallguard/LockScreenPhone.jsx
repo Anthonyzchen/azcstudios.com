@@ -41,10 +41,10 @@ const LOGICAL_HEIGHT = SCREEN_HEIGHT + BEZEL * 2;
  * this is what actually lands on the lock screen.
  */
 const PUSH = {
-  title: "Serious risk: Marketside Chicken Fettuccine Alfredo",
-  body: "Listeria monocytogenes. Nate's Fine Foods. Tap for details.",
-  // The date the FDA notice published, and it really was a Tuesday.
-  date: "Tuesday, June 17",
+  title: "Serious risk: Boar\'s Head Strassburger Brand Liverwurst",
+  body: "Listeria monocytogenes. Boar\'s Head Provisions Co. Tap for details.",
+  // The day the FSIS notice published, and it really was a Thursday.
+  date: "Thursday, July 25",
   time: "9:41",
 };
 
@@ -246,10 +246,15 @@ export const LockScreenPhone = () => {
                 <p className="line-clamp-2 text-[14.5px] font-bold leading-[1.3] text-[#111827]">
                   {PUSH.title}
                 </p>
-                {/* Two lines, not one. iOS gives a collapsed notification
-                    about four lines total, and a single truncated line cut
-                    "Nate's Fine Foods" mid-word, which reads as a layout bug
-                    rather than as the platform clipping a long string. */}
+                {/* Two lines each, not one. iOS gives a collapsed notification
+                    about four lines total, and a single truncated line cut the
+                    firm name mid-word, which reads as a layout bug rather than
+                    as the platform clipping a long string.
+
+                    The current title lands on exactly two lines with no ellipsis
+                    ("Serious risk: Boar's Head" / "Strassburger Brand
+                    Liverwurst"). Re-check this if PUSH changes — a third line
+                    gets clipped and the product name is what disappears. */}
                 <p className="mt-px line-clamp-2 text-[14.5px] leading-[1.32] text-[#1f2937]">
                   {PUSH.body}
                 </p>

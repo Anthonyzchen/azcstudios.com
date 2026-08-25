@@ -40,7 +40,7 @@ export const HeroPhone = ({ chips }) => {
     () => {
       const mm = gsap.matchMedia();
 
-      // Both conditions have to hold: the chips only float at xl, and all of
+      // Both conditions have to hold: the chips only float from sm up, and all of
       // this is motion for its own sake, so it is the first thing to go when
       // someone has asked for less of it. Outside this block the chips sit at
       // their CSS defaults, which is visible and in position — the entrance
@@ -86,9 +86,17 @@ export const HeroPhone = ({ chips }) => {
                 // `|| 0` rather than a bare Number(): a chip added without a
                 // drift value would otherwise yield NaN, and GSAP writes a
                 // broken transform for it without complaining.
-                x: Number(node.dataset.drift) || 0,
+                x: () => {
+                  const drift = Number(node.dataset.drift) || 0;
+                  if (drift <= 0) return drift;
+                  const box = scopeRef.current.getBoundingClientRect();
+                  // 8px so the chip's shadow stops short of the edge too.
+                  const room = window.innerWidth - box.right - 8;
+                  return Math.min(drift, Math.max(room, 0));
+                },
                 ease: "none",
                 scrollTrigger: {
+                  invalidateOnRefresh: true,
                   trigger: scopeRef.current,
                   // "top top", not "top bottom". The hero is the first thing on
                   // the page, so its top has already passed the viewport bottom
@@ -117,7 +125,7 @@ export const HeroPhone = ({ chips }) => {
   return (
     <div
       ref={scopeRef}
-      className="relative mx-auto w-full max-w-[300px] xl:max-w-[37rem]"
+      className="relative mx-auto w-full max-w-[300px] sm:max-w-[33rem] xl:max-w-[37rem]"
     >
       <img
         src={feedScreenshot}
@@ -127,7 +135,7 @@ export const HeroPhone = ({ chips }) => {
         loading="eager"
         onMouseEnter={() => setPhoneHovered(true)}
         onMouseLeave={() => setPhoneHovered(false)}
-        className="mx-auto w-full max-w-[300px] rounded-[1.75rem] border border-line shadow-sm xl:max-w-[280px]"
+        className="mx-auto w-full max-w-[300px] rounded-[1.75rem] border border-line shadow-sm sm:max-w-[220px] xl:max-w-[280px]"
       />
 
       {chips.map((chip) => (
@@ -135,7 +143,7 @@ export const HeroPhone = ({ chips }) => {
           key={chip.title}
           data-chip
           data-drift={chip.drift}
-          className={`hidden xl:absolute xl:block xl:w-[11rem] ${chip.position}`}
+          className={`hidden sm:absolute sm:block sm:w-[9.5rem] xl:w-[11rem] ${chip.position}`}
         >
           <div
             data-chip-enter

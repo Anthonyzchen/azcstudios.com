@@ -44,6 +44,12 @@ export default {
         // measure is a character count, not a pixel count, so a wider column is
         // only legible if the characters got wider too.
         prose: "33rem",
+        // 68rem. Was briefly narrowed to 56rem to close the gap right of a
+        // 33rem prose column; reverted 2026-08-24 — it shrank the gap without
+        // closing it, and cost ~0.9 viewports of extra height because narrower
+        // blocks wrap more. The gap is a content problem, not a band problem:
+        // sections that read as full have two-column content, sections that
+        // read as empty are a single prose column.
         content: "68rem",
       },
       transitionTimingFunction: {
