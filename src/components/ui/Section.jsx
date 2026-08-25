@@ -1,18 +1,20 @@
 /**
  * A page section with an optional eyebrow label.
  *
- * The section is a three-column grid: a centre column at the reading measure,
- * and a gutter either side. Children land in the centre by default; anything
- * with `breakout` spans the full band instead. See index.css.
+ * The section is a two-column grid: a reading column at the measure, starting
+ * at the content edge, and slack to its right. Children land in the reading
+ * column by default; anything with `breakout` spans the full band from the same
+ * left edge. One rail, two widths. See index.css.
  */
 export const Section = ({
   eyebrow,
   title,
   children,
   className = "",
-  // Anchors the eyebrow and title to the exhibit edge rather than the reading
-  // column. For sections that are mostly one big figure, where a header
-  // indented into the column reads as detached from the thing it introduces.
+  // Spans the eyebrow and title across the band instead of the reading column.
+  // Not an alignment switch — one rail handles that — purely a width one, for
+  // sections whose content is a full-band table or list and whose header would
+  // otherwise sit in a narrow column above something much wider.
   wideHeader = false,
   id,
 }) => (

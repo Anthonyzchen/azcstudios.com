@@ -383,9 +383,9 @@ const RecallGuard = () => {
             column keeps enough gutter for the annotation chips to sit beside
             the phone instead of on top of it. See the arithmetic in the comment
             above that box before changing either number. */}
-        <div className="mx-auto grid max-w-content items-center gap-12 lg:grid-cols-[minmax(0,27rem)_1fr] lg:gap-16">
+        <div className="mx-auto grid max-w-content items-center gap-12 lg:grid-cols-[minmax(0,24rem)_1fr] xl:grid-cols-[minmax(0,27rem)_1fr] xl:gap-16">
           <div>
-            <div className="mb-6 flex items-center gap-3">
+            <div className="mb-8 flex items-center gap-3">
               <span
                 className="h-2.5 w-2.5 rounded-full bg-rg"
                 aria-hidden="true"
@@ -415,7 +415,7 @@ const RecallGuard = () => {
                 and are left as written — rewriting the record of why a line
                 reads the way it does destroys the reasoning, which is the part
                 a future editor actually needs. */}
-            <h1 className="mb-6 text-balance font-Fraunces text-display-sm font-normal text-ink">
+            <h1 className="mb-8 text-balance font-Fraunces text-display-sm font-normal text-ink">
               The recall happens after the food is in your pantry.
             </h1>
 
@@ -538,7 +538,7 @@ const RecallGuard = () => {
           <div>
             <Paragraph className="mb-8">
               This is an example of a notification the app actually sends. The
-              recall is the pre-cooked pasta listeria case below, on the day its
+              recall is the deli-meat listeria case below, on the day its
               notice published.
             </Paragraph>
 
@@ -1073,7 +1073,13 @@ const RecallGuard = () => {
             width="900"
             height="1350"
             loading="lazy"
-            className="mx-auto aspect-[4/5] w-full max-w-sm rounded-2xl object-cover"
+            // Pulled up to sit level with the section header rather than with
+            // the copy beside it, so the photo reads as part of the section
+            // opening instead of as something that starts late. 144px is the
+            // measured height of the eyebrow-plus-title block at lg; re-measure
+            // if either the eyebrow or the title\'s wrap changes. Only at lg —
+            // below that the grid stacks and the image follows the copy.
+            className="mx-auto aspect-[4/5] w-full max-w-sm rounded-2xl object-cover lg:-mt-36"
           />
         </div>
 
@@ -1088,49 +1094,13 @@ const RecallGuard = () => {
         <div className="breakout mt-16 grid gap-x-12 gap-y-10 sm:grid-cols-2">
           {FEATURES.map((feature) => (
             <div key={feature.title}>
-              <div className="mb-5 h-px w-10 bg-rg" aria-hidden="true" />
+              <div className="mb-4 h-px w-10 bg-rg" aria-hidden="true" />
               <h3 className="mb-3 font-Fraunces text-lg text-ink">
                 {feature.title}
               </h3>
               <Paragraph>{feature.body}</Paragraph>
             </div>
           ))}
-        </div>
-
-        {/* Coverage note. Both agencies are live sources: FDA (human + animal
-            food) and USDA FSIS (meat, poultry, egg) — see poll-fda-recalls and
-            poll-fsis-recalls. Poll cadence is stated honestly here because
-            claims.md bans real-time phrasing. */}
-        <div className="breakout mt-12 rounded-2xl border border-line bg-paper-sunk p-6 sm:p-8">
-          <h3 className="mb-3 font-Fraunces text-lg text-ink">
-            What's covered
-          </h3>
-          <Paragraph className="mb-4">
-            FDA and USDA FSIS both, so a beef recall and a cookie recall reach
-            you the same way.
-          </Paragraph>
-          {/* Keep this one verbatim. It limits the promise, and a limit is
-              worth more words than a benefit. */}
-          <Paragraph>
-            Alerts land the same day the agency posts the recall, not the
-            instant it happens. We poll the feeds on a schedule rather than
-            claiming a real-time pipe we don't have.
-          </Paragraph>
-        </div>
-      </Section>
-
-      {/* Alert behavior. Eyebrow names what the section decides ("what gets
-          through") rather than the feature it belongs to ("Alerts"), and the
-          title is the sharpest sentence the section already had — it was the
-          lede, doing headline work from one size down. Its other half stays
-          below as the paragraph, so nothing was cut to make room. */}
-      <Section
-        eyebrow="What gets through"
-        title="A technicality never wakes you up."
-        wideHeader
-      >
-        <div className="breakout mb-6">
-          <Paragraph>And a genuine hazard never gets buried.</Paragraph>
         </div>
 
         {/* The announcement-day story. A recall is public well before the FDA
@@ -1220,8 +1190,9 @@ const RecallGuard = () => {
         eyebrow="Pricing"
         title="One subscription, no free tier"
         className="text-center"
+      wideHeader
       >
-        <div className="mx-auto w-full max-w-[24rem] rounded-2xl border border-line bg-white/60 p-8">
+        <div className="breakout mx-auto w-full max-w-[24rem] rounded-2xl border border-line bg-white/60 p-8">
           {/* The billing-term line is deliberately full-strength `text-graphite`
               rather than the `graphite/70` used for supporting copy elsewhere on
               this page. Fading it is what turns a monthly-first price into the
@@ -1229,7 +1200,7 @@ const RecallGuard = () => {
               big number, but the term and the annual total have to read as
               first-class text, not as a disclaimer. Don't "tidy" this to /70. */}
           <p className="mb-1 font-Fraunces text-4xl text-ink">$4.00/mo</p>
-          <p className="mb-6 text-sm text-graphite">
+          <p className="mb-8 text-sm text-graphite">
             Billed annually at $48/year, after a 14-day free trial
           </p>
           <List
@@ -1285,11 +1256,11 @@ const RecallGuard = () => {
       {/* Last section on the page now, which suits it: the legal and support
           links at the end were always footer-shaped, and they land where a
           reader expects to find them rather than mid-scroll. */}
-      <Section eyebrow="Questions" title="Frequently asked">
+      <Section eyebrow="Questions" title="Frequently asked" wideHeader>
         {/* Capped here rather than on the Section, same reason as the chain
             diagram above: the answers are body copy and want the measure, but
             the shell should not narrow just because its contents do. */}
-        <div className="rule-top">
+        <div className="breakout rule-top">
           {FAQS.map((faq) => (
             <FaqItem
               key={faq.question}

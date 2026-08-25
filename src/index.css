@@ -72,13 +72,27 @@ html {
    * Named lines rather than nth-child rules so a block declares its own width
    * where it is written, and adding a section cannot silently re-shuffle the
    * ones around it. */
+  /* ONE LEFT RAIL, not two. The centre column used to be centred in the band,
+   * which gave the page a second left edge: exhibits began at the content edge
+   * and prose began ~280px inside it, alternating section by section. An audit
+   * found five distinct left edges down the page.
+   *
+   * The reading column now starts where the exhibits start. Text keeps its
+   * measure and simply begins at the same rail, so the eye tracks one line all
+   * the way down.
+   *
+   * The whitespace moves to the RIGHT of prose, in every section, always in the
+   * same place. That is the difference between a margin and a gap: the earlier
+   * stranding complaint came from the space being inconsistent, not from it
+   * existing. */
   .section-grid {
     display: grid;
     grid-template-columns:
-      [full-start] minmax(0, 1fr)
-      [content-start] min(theme("maxWidth.prose"), 100%)
+      [full-start content-start] min(theme("maxWidth.prose"), 100%)
       [content-end] minmax(0, 1fr)
       [full-end];
+    max-width: theme("maxWidth.content");
+    margin-inline: auto;
   }
 
   .section-grid > * {
@@ -91,8 +105,6 @@ html {
   .section-grid > .breakout {
     grid-column: full;
     width: 100%;
-    max-width: theme("maxWidth.content");
-    margin-inline: auto;
   }
 
   /* A breakout widens the BLOCK. It must never widen the reading measure.
@@ -111,7 +123,20 @@ html {
    * A breakout that IS a paragraph is not matched — this is a descendant
    * selector — which is exactly right for the source-citation lines. They are
    * scanned, not read, and they are meant to span. */
-  .section-grid > .breakout :is(p, li, figcaption, dd, dt) {
+  .section-grid > .breakout :is(p, li, figcaption, dd, dt):not(.wide) {
     max-width: theme("maxWidth.prose");
+  }
+
+  /* The opt-out. A block that breaks out keeps its prose at the measure by
+   * default, which is right almost everywhere — but a card whose whole point is
+   * a full-band exhibit reads as hollow with a 33rem column of text inside a
+   * 68rem shell. `wide` releases one element from the measure.
+   *
+   * It costs legibility, so it is a decision each time and not a default:
+   * a released paragraph runs past 100 characters a line at this band. Use it
+   * for ledes and short blocks under a heading, never for body copy someone
+   * reads at length. */
+  .section-grid > .breakout .wide {
+    max-width: none;
   }
 }
