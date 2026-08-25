@@ -152,13 +152,24 @@ const Home = () => {
       </Section>
 
       {/* Contact */}
-      <Section eyebrow="Contact" title="Get in touch" id="contact">
-        <Paragraph className="mb-6 max-w-prose">
+      {/* Contact breaks out like Products and Approach above it. It was left in
+          the reading column when those two were fixed, on the reasoning that it
+          holds no wide content and the shared left rail made the narrower box
+          invisible. Visible enough: it is the last section on the page, so its
+          right edge is the one the eye rests on, and it stopped 560px short of
+          where the two sections above it ended. */}
+      <Section eyebrow="Contact" title="Get in touch" id="contact" wideHeader>
+        <Paragraph className="breakout mb-6">
           Questions about a product, press, or partnerships. This address
           reaches us directly.
         </Paragraph>
-        <CopyEmail email={SUPPORT_EMAIL} variant="button" />
-        <p className="mt-8 text-sm text-graphite/70">
+        <div className="breakout">
+          <CopyEmail email={SUPPORT_EMAIL} variant="button" />
+        </div>
+        {/* breakout, not `wide`. The measure rule only governs <p> DESCENDANTS
+            of a .breakout; a direct grid child like this one is placed by
+            `grid-column: content` instead, which `wide` has no effect on. */}
+        <p className="breakout mt-8 text-sm text-graphite/70">
           {LEGAL_ENTITY} is a limited liability company registered in New York.
           The studio is run by{" "}
           <a

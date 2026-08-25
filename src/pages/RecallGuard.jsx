@@ -872,7 +872,18 @@ const RecallGuard = () => {
             same as told.
           </Paragraph>
 
-          <p className="mt-6 text-xs leading-relaxed text-graphite/80">
+          {/* wide, which opts this out of the measure rule inside .breakout and
+              lets it run the card's full width like the capacity infographic's
+              sources line does. A citation is scanned for a name and a date,
+              not read left to right, so the measure that governs body copy does
+              not govern it — and a source line that stops halfway across an
+              exhibit reads as an unfinished column rather than as a footnote.
+
+              The two paragraphs above deliberately do NOT get this. They are
+              running copy at 66 characters a line; the card's full width would
+              put them at 126, against a 65-75 target. Exhibits span, prose
+              holds the measure — that split is the whole point of the grid. */}
+          <p className="wide mt-6 text-xs leading-relaxed text-graphite/80">
             CDC listeria outbreak investigation, deli meats, final update; USDA
             FSIS recall notices, July 2024. Outbreak declared over 21 November
             2024, so these are final counts.
@@ -937,7 +948,16 @@ const RecallGuard = () => {
 
             42rem, not the narrowed 33rem prose token: this is a diagram, not
             copy, and the boxes need more room than a line of text does. */}
-        <figure className="breakout mx-auto my-0 !max-w-[42rem]">
+        {/* [&>p]:mx-auto centres the figure's own paragraphs IN THE FIGURE. Without
+            it the Section's text-center still applies, but each <p> is capped at
+            the 33rem measure and pinned left, so the text centres inside a 528px
+            box sitting at the left of a 672px figure — off-axis by 72px, which
+            reads as sloppy centring rather than as left alignment.
+
+            Direct children only. "And there it stops" is a <p> nested inside a
+            flex row between two rules, and auto margins there fight the flex-1
+            spans that are meant to absorb the slack. */}
+        <figure className="breakout mx-auto my-0 !max-w-[42rem] [&>p]:mx-auto">
           <p
             id="chain-required"
             className="mb-4 font-Inter text-xs uppercase tracking-[0.16em] text-graphite/80"
@@ -1198,7 +1218,24 @@ const RecallGuard = () => {
             </div>
           ))}
         </div>
+      </Section>
 
+      {/* Alert behaviour, and its own section again. The header was dropped by
+          the hunk-split in 8652961, which left the table and its intro trailing
+          the pantry section's feature grid with nothing between them — so the
+          announcement paragraph read as a second body for the "Pet food" cell
+          rather than as the opening of a new argument.
+
+          The eyebrow names what the section decides ("what gets through")
+          rather than the feature it belongs to ("Alerts"), and the title is the
+          sharpest sentence the section already had: it was the lede, doing
+          headline work one size down. Its other half stays below as the
+          paragraph, so nothing was cut to make room. */}
+      <Section
+        eyebrow="What gets through"
+        title="A technicality never wakes you up."
+        wideHeader
+      >
         {/* The announcement-day story. A recall is public well before the FDA
             grades it, and the app has read the announcement feed since
             2026-08-21 rather than waiting for the classification, so this table
