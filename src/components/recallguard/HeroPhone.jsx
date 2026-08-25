@@ -23,14 +23,38 @@ import feedScreenshot from "../../assets/images/recallguard-feed.webp";
  * opinion about DOM adjacency, and it keeps the "hovering a chip must not move
  * that chip" behaviour that `group-hover` would have cost.
  *
- * At xl the box is wider than the screenshot it holds: the phone sits at 280px
- * in the middle and the chips live in the gutters either side, clipping the
- * phone's frame rather than covering the cards they point at. The arithmetic is
- * worth knowing before touching either number. The hero column is (68rem
- * content - 4rem gap) split by the grid; the asymmetric split in RecallGuard.jsx
- * leaves this side 592px, giving 156px gutters against a 176px chip, so each
- * overlaps by 20px of rounded frame. An even 50/50 split left 116px of gutter,
- * which put 60px of chip over the card text.
+ * The box is always wider than the screenshot it holds: the phone sits in the
+ * middle and the chips live in the gutters either side, clipping the phone's
+ * frame rather than covering the cards they point at.
+ *
+ * ONE set of numbers for every width the chips float at, and that is the point.
+ * There used to be three (sm, lg, xl), and each extra set was another pair free
+ * to drift apart — which is exactly what happened between the float breakpoint
+ * and the matchMedia query.
+ *
+ *   container   w-full, capped at 37rem / 592px
+ *   screenshot  min(300px, 100% - 18rem)
+ *   chip        9.5rem / 152px
+ *   gutter      146px a side, so a chip overlaps the frame by 6px
+ *
+ * 300px IS THE NUMBER THE LOCK SCREEN RENDERS AT, and that is the whole reason
+ * for it. Two phones appear on this page a screen apart; at different sizes
+ * they read as two different devices rather than as one product photographed
+ * twice. If LockScreenPhone's frame width changes, change this with it.
+ *
+ * The min() matters below ~684px, where the container is narrower than
+ * 300 + 288 and a fixed 300 would push the chips off their gutters. There the
+ * screenshot gives way instead, and the gutters stay put.
+ *
+ * This replaced a fixed 220px screenshot that sat inside an 884px grid at 982px
+ * wide, throwing away 356px on a phone barely half the size of a real one. The
+ * fix was never "make it as big as possible" — 416px cleared the room and was
+ * then too big for the page it sits on.
+ *
+ * Below sm the chips do not float at all. 342px of usable width cannot hold a
+ * legible screenshot AND a chip either side, so RecallGuard.jsx renders the
+ * same four as a caption list under the phone. Decided 2026-08-25: on a phone a
+ * readable screenshot beats an anchored annotation.
  */
 export const HeroPhone = ({ chips }) => {
   const scopeRef = useRef(null);
@@ -45,8 +69,14 @@ export const HeroPhone = ({ chips }) => {
       // someone has asked for less of it. Outside this block the chips sit at
       // their CSS defaults, which is visible and in position — the entrance
       // below must never be the only thing that makes them appear.
+      //
+      // KEEP THIS BREAKPOINT EQUAL TO THE ONE THE CHIPS FLOAT AT. It is `sm:`
+      // on [data-chip] in the markup below; the two are one decision written in
+      // two languages. They disagreed once — the query was left at 1280px while
+      // the markup moved to sm — and the result was chips that appeared on a
+      // 900px screen, correctly positioned, and simply never animated.
       mm.add(
-        "(min-width: 1280px) and (prefers-reduced-motion: no-preference)",
+        "(min-width: 640px) and (prefers-reduced-motion: no-preference)",
         () => {
           // Entrance: one chip at a time, each emerging from behind the phone.
           //
@@ -125,7 +155,7 @@ export const HeroPhone = ({ chips }) => {
   return (
     <div
       ref={scopeRef}
-      className="relative mx-auto w-full max-w-[300px] sm:max-w-[33rem] xl:max-w-[37rem]"
+      className="relative mx-auto w-full max-w-[300px] sm:max-w-[37rem]"
     >
       <img
         src={feedScreenshot}
@@ -135,7 +165,7 @@ export const HeroPhone = ({ chips }) => {
         loading="eager"
         onMouseEnter={() => setPhoneHovered(true)}
         onMouseLeave={() => setPhoneHovered(false)}
-        className="mx-auto w-full max-w-[300px] rounded-[1.75rem] border border-line shadow-sm sm:max-w-[220px] xl:max-w-[280px]"
+        className="mx-auto w-full max-w-[300px] rounded-[1.75rem] border border-line shadow-sm sm:max-w-[min(300px,calc(100%-18rem))]"
       />
 
       {chips.map((chip) => (
@@ -143,7 +173,7 @@ export const HeroPhone = ({ chips }) => {
           key={chip.title}
           data-chip
           data-drift={chip.drift}
-          className={`hidden sm:absolute sm:block sm:w-[9.5rem] xl:w-[11rem] ${chip.position}`}
+          className={`hidden sm:absolute sm:block sm:w-[9.5rem] ${chip.position}`}
         >
           <div
             data-chip-enter

@@ -212,12 +212,13 @@ const CAPACITY_FIGURES = [
   },
 ];
 
-// The toll is quoted from the CDC's final case count, not from the interim
-// CDC\'s FINAL counts, the outbreak having been declared over 2024-11-21. The
-// death count is not repeated here — the stat directly above carries it as
-// 2 -> 10.
-// numbers that circulated while the outbreak was open (an earlier report had
+// CDC's FINAL counts, the outbreak having been declared over 2024-11-21, not
+// the interim numbers that circulated while it was open (an earlier report had
 // six deaths and 18 states).
+//
+// The death count is deliberately absent here — the Stat directly above carries
+// it as 2 -> 10, where the movement is the argument. Repeating "10 dead" would
+// spend the page's loudest number twice and flatten it the second time.
 const OUTBREAK_TOLL = [
   { figure: "61", label: "infected" },
   { figure: "60", label: "hospitalized" },
@@ -324,7 +325,7 @@ const FAQS = [
   {
     question: "Where does the recall data come from?",
     answer:
-            // The second sentence is the same-day LIMIT, moved here on 2026-08-24
+      // The second sentence is the same-day LIMIT, moved here on 2026-08-24
       // when the "What's covered" card was cut. Keep it verbatim: it bounds the
       // promise, claims.md bans real-time phrasing, and a limit is worth more
       // words than a benefit. It was the only reason that card still existed.
@@ -389,7 +390,7 @@ const RecallGuard = () => {
             column keeps enough gutter for the annotation chips to sit beside
             the phone instead of on top of it. See the arithmetic in the comment
             above that box before changing either number. */}
-        <div className="mx-auto grid max-w-content items-center gap-12 lg:grid-cols-[minmax(0,24rem)_1fr] xl:grid-cols-[minmax(0,27rem)_1fr] xl:gap-16">
+        <div className="mx-auto grid max-w-content items-center gap-12 xl:grid-cols-[minmax(0,27rem)_1fr] xl:gap-16">
           <div>
             <div className="mb-8 flex items-center gap-3">
               <span
@@ -488,6 +489,23 @@ const RecallGuard = () => {
             </div>
           </div>
 
+          {/* TWO COLUMNS ONLY FROM xl, and the hero runs to 80rem there rather
+              than the 68rem the rest of the page uses. Both exist to give the
+              phone room.
+
+              The split used to start at lg, which left the phone side ~490px at
+              1024. That is LESS room than the same page has at 982 stacked, so
+              widening the browser made the screenshot shrink — it sat at 220px
+              against a real iPhone's 390. Stacking through 1279 keeps the phone
+              at its full size across the whole mid range; the cost is roughly
+              400px of extra hero height in that band, taken deliberately.
+
+              The band stays at 68rem. At xl that leaves the phone side
+              exactly 592px (1088 - 27rem copy - 4rem gap), which is the
+              container's cap — so the phone renders at its full 300px there
+              without the hero needing a wider band than the rest of the page.
+
+          */}
           {/* The product, in the first screen. This used to be the editorial
               kitchen photo (now moved down to Why) on the rule that these
               photos are atmosphere and never product shots. That rule still
@@ -551,8 +569,8 @@ const RecallGuard = () => {
           <div>
             <Paragraph className="mb-8">
               This is an example of a notification the app actually sends. The
-              recall is the deli-meat listeria case below, on the day its
-              notice published.
+              recall is the deli-meat listeria case below, on the day its notice
+              published.
             </Paragraph>
 
             <ol className="flex flex-col gap-8">
@@ -765,7 +783,7 @@ const RecallGuard = () => {
           <p className="mb-5 font-Inter text-eyebrow uppercase text-graphite/60">
             After the notice
           </p>
-        {/* THIS BLOCK ARGUES ONE THING AND MUST KEEP ARGUING IT: people kept
+          {/* THIS BLOCK ARGUES ONE THING AND MUST KEEP ARGUING IT: people kept
             getting sick AFTER the recall was public. That is the gap RecallGuard
             closes.
 
@@ -795,8 +813,8 @@ const RecallGuard = () => {
                defiance of the notice — the sources support the curve, not that.
             3. Listeria incubates up to ~70 days, so do not pin any individual
                death to a post-recall exposure. The claim is the ONSET WINDOW,
-               which is documented, and that is enough. */}}
-          {/*           {/* h3, not h2. This card used to be its own Section with no title,
+               which is documented, and that is enough. */}
+          {/* h3, not h2. This card used to be its own Section with no title,
               so its heading sat level with every other section heading. Folding
               it into "Why it matters" — which does render an h2 — made it a
               subsection, and the markup has to say so. */}
@@ -805,12 +823,25 @@ const RecallGuard = () => {
             September.
           </h3>
           <Paragraph className="mb-10">
-            Listeria in deli meat sliced at the counter, traced to one Boar\'s
+            Listeria in deli meat sliced at the counter, traced to one Boar's
             Head plant in Jarratt, Virginia. Seven million pounds came off the
             shelves. Two people had died when the recall went out.
           </Paragraph>
 
-          <div className="mb-10 max-w-sm">
+          {/* [&_p]:!max-w-none, because Stat's label is a <p> and the measure
+              rule inside .breakout caps every <p> at the 33rem prose token.
+
+              The bang is load-bearing. That rule is
+              `.section-grid > .breakout :is(p,...):not(.wide)`, which outranks a
+              plain `[&_p]:max-w-none` on specificity, so the unimportant version
+              compiles fine, changes nothing, and looks like it worked. Stat
+              takes no className, so tagging the <p> with .wide directly is not
+              available without widening its API for one caller.
+              Correct for running copy, wrong here: this label is a caption on a
+              figure, it reads as one line at the card's width, and capped it
+              broke across three lines against a two-character number. Replaces
+              a max-w-sm that pinned the whole stat to 24rem. */}
+          <div className="mb-10 [&_p]:!max-w-none">
             <Stat
               from="2"
               to="10"
@@ -858,7 +889,18 @@ const RecallGuard = () => {
             same as told.
           </Paragraph>
 
-          <p className="mt-6 text-xs leading-relaxed text-graphite/80">
+          {/* wide, which opts this out of the measure rule inside .breakout and
+              lets it run the card's full width like the capacity infographic's
+              sources line does. A citation is scanned for a name and a date,
+              not read left to right, so the measure that governs body copy does
+              not govern it — and a source line that stops halfway across an
+              exhibit reads as an unfinished column rather than as a footnote.
+
+              The two paragraphs above deliberately do NOT get this. They are
+              running copy at 66 characters a line; the card's full width would
+              put them at 126, against a 65-75 target. Exhibits span, prose
+              holds the measure — that split is the whole point of the grid. */}
+          <p className="wide mt-6 text-xs leading-relaxed text-graphite/80">
             CDC listeria outbreak investigation, deli meats, final update; USDA
             FSIS recall notices, July 2024. Outbreak declared over 21 November
             2024, so these are final counts.
@@ -883,9 +925,18 @@ const RecallGuard = () => {
           statement to PIRG dated 2025-01-07. Do not paraphrase the quote into
           something stronger than "not all" — it is a limit, not an admission
           that most recalls go unpublished. */}
+      {/* text-center on the Section, which carries to the eyebrow, the title
+          and the intro. Centred once before and lost it in the 86f397a merge,
+          which took the other session's left-aligned variant of this block.
+
+          Centring only works because the header and the intro break out first:
+          a centred child of the reading column centres inside 33rem, which puts
+          it ~184px left of the band's true centre and reads as a mistake rather
+          than as centring. */}
       <Section
         eyebrow="Why nobody called"
         title="The rules stop one step short of you"
+        className="text-center"
         wideHeader
       >
         {/* Breakout so the intro anchors to the same left edge as the diagram
@@ -893,11 +944,11 @@ const RecallGuard = () => {
             section reads as one exhibit with a header, not as a paragraph that
             happens to precede a picture. Capped so the measure survives the
             wider band. */}
-        <div className="breakout mb-10">
+        <div className="breakout mb-10 [&_p]:mx-auto">
           <Paragraph>
-            A recall is a relay, and most of it is compulsory. The product
-            really does come off the shelf. Here is every handoff the system is
-            actually obliged to make, and the one it isn't.
+            A recall is a relay, and the products come off the shelf. Here is
+            every handoff the system is actually obliged to make, and the one it
+            isn't.
           </Paragraph>
         </div>
 
@@ -914,7 +965,16 @@ const RecallGuard = () => {
 
             42rem, not the narrowed 33rem prose token: this is a diagram, not
             copy, and the boxes need more room than a line of text does. */}
-        <figure className="breakout m-0 !max-w-[42rem]">
+        {/* [&>p]:mx-auto centres the figure's own paragraphs IN THE FIGURE. Without
+            it the Section's text-center still applies, but each <p> is capped at
+            the 33rem measure and pinned left, so the text centres inside a 528px
+            box sitting at the left of a 672px figure — off-axis by 72px, which
+            reads as sloppy centring rather than as left alignment.
+
+            Direct children only. "And there it stops" is a <p> nested inside a
+            flex row between two rules, and auto margins there fight the flex-1
+            spans that are meant to absorb the slack. */}
+        <figure className="breakout mx-auto my-0 !max-w-[42rem] [&>p]:mx-auto">
           <p
             id="chain-required"
             className="mb-4 font-Inter text-xs uppercase tracking-[0.16em] text-graphite/80"
@@ -1017,12 +1077,13 @@ const RecallGuard = () => {
             recall communication.
           </p>
 
-          <figcaption className="mx-auto mt-8 max-w-[34rem] text-center text-[0.95rem] leading-relaxed text-graphite">
-            So the food leaves the shelf and the notice sits in a federal feed,
-            correct and public and unread. Neither of those reaches the box
-            already in your cupboard. Someone has to go and get that notice, and
-            check it against your pantry.
-          </figcaption>
+          {/* No figcaption. It used to close with "So the food leaves the shelf
+              and the notice sits in a federal feed..." — cut 2026-08-25 because
+              the diagram had already said it: the required chain ends at the
+              stores, the one row nobody owes you sits alone below the break,
+              and restating that in prose only softened it. A <figure> without a
+              <figcaption> is valid, and the two <ol>s carry their own names via
+              aria-labelledby, so nothing was load-bearing here. */}
         </figure>
 
         <p className="breakout mt-8 text-xs leading-relaxed text-graphite/80">
@@ -1065,10 +1126,24 @@ const RecallGuard = () => {
           one is nobody is obliged to tell you, this one is that the channels
           which do tell you say too much to be heard. Do not reintroduce the
           "in my kitchen" phrasing here. */}
+      {/* No wideHeader, and that is the actual fix for the photo overlapping
+          the title rather than the negative margin below it.
+
+          wideHeader breaks the eyebrow and title out to the full 1088px band.
+          This section's content is a two-column grid whose right column is the
+          photo, so a full-band title runs underneath it: at 1024px the title
+          text ended 139px past the photo's left edge. Pulling the photo down
+          would have fixed the collision by abandoning the alignment the pull
+          exists to create.
+
+          In the reading column the title ends at 528px and the photo starts at
+          816px, so they cannot meet at any width, and the header now aligns
+          with the copy column it introduces. wideHeader is for sections whose
+          content is a full-band table or list — this one is not, and it should
+          not have carried the prop. */}
       <Section
         eyebrow="In your pantry"
         title="Everything else is either noise or silence"
-        wideHeader
       >
         <div className="breakout grid gap-10 lg:grid-cols-2 lg:gap-16">
           <div className="space-y-5">
@@ -1120,11 +1195,25 @@ const RecallGuard = () => {
             loading="lazy"
             // Pulled up to sit level with the section header rather than with
             // the copy beside it, so the photo reads as part of the section
-            // opening instead of as something that starts late. 144px is the
-            // measured height of the eyebrow-plus-title block at lg; re-measure
-            // if either the eyebrow or the title\'s wrap changes. Only at lg —
+            // opening instead of as something that starts late. Only at lg —
             // below that the grid stacks and the image follows the copy.
-            className="mx-auto aspect-[4/5] w-full max-w-sm rounded-2xl object-cover lg:-mt-36"
+            //
+            // 140px is the distance from the eyebrow's top to the grid's top,
+            // which makes it the MAXIMUM safe pull rather than a chosen one:
+            // exactly level with the eyebrow, never over it.
+            //
+            // Stable because the header no longer breaks out: in the 528px
+            // reading column this title always wraps to two lines at lg and up,
+            // so the block it has to clear does not change height. It was
+            // briefly -mt-36 against a wideHeader that put the title on one
+            // line, and the photo covered it by 44px.
+            //
+            // Prefer this bound over re-measuring to taste. If the title wraps
+            // again at some width the header grows, the grid top moves down,
+            // and a fixed 100px pull leaves the photo slightly LOW — visibly
+            // imperfect but never covering the words, which is the failure mode
+            // that matters.
+            className="mx-auto aspect-[4/5] w-full max-w-sm rounded-2xl object-cover lg:-mt-[140px]"
           />
         </div>
 
@@ -1147,19 +1236,50 @@ const RecallGuard = () => {
             </div>
           ))}
         </div>
+      </Section>
 
+      {/* Alert behaviour, and its own section again. The header was dropped by
+          the hunk-split in 8652961, which left the table and its intro trailing
+          the pantry section's feature grid with nothing between them — so the
+          announcement paragraph read as a second body for the "Pet food" cell
+          rather than as the opening of a new argument.
+
+          The eyebrow names what the section decides ("what gets through")
+          rather than the feature it belongs to ("Alerts").
+
+          The title carries BOTH gates, which is the correction it exists for.
+          It replaced "A technicality never wakes you up." on 2026-08-25 —
+          accurate about the severity gate, silent about the preference one, and
+          vague ("technicality", and "wakes you up" implies night). Verified
+          against the app rather than the vault plan: the two gates are
+          find_matching_users_for_recall (state, allergens, pantry, categories —
+          whether a recall reaches you) and pushTreatmentForSeverity (loud /
+          silent / feed-only — how it arrives). A title that names only the
+          second reads as though severity alone decides everything. */}
+      <Section
+        eyebrow="What gets through"
+        title="You choose what reaches you. The severity decides how loudly."
+        wideHeader
+      >
         {/* The announcement-day story. A recall is public well before the FDA
             grades it, and the app has read the announcement feed since
             2026-08-21 rather than waiting for the classification, so this table
             has four rows where the FDA only has three classes. Saying that out
             loud is the point: it is the coverage no competitor has, and the
             hedge is what makes claiming it honest. */}
+        {/* wide, so this runs the band like the table it introduces. It is a
+            caption on the exhibit below rather than running copy — the fourth
+            row it promises is visible while you read the sentence — and a lead
+            stopping at 33rem above a 1088px table read as a stray column. */}
         <div className="breakout mb-10">
-          <Paragraph>
-            A recall is public before it is graded, and the grade can take
-            weeks. RecallGuard reads the announcements the day they publish
-            rather than waiting, which is why there is a fourth row below that
-            the FDA does not have.
+          <Paragraph className="wide">
+            Every row below describes a recall that already matched your
+            household. What you track decides whether one reaches you at all;
+            the table is only about how it arrives once it has. A recall is also
+            public before it is graded, and the grade can take weeks, so
+            RecallGuard reads the announcements the day they publish rather than
+            waiting — which is why there is a fourth row here that the FDA does
+            not have.
           </Paragraph>
         </div>
 
@@ -1173,8 +1293,16 @@ const RecallGuard = () => {
                 <th className="pb-3 pr-6 text-xs uppercase tracking-[0.2em] text-graphite/60">
                   FDA meaning
                 </th>
+                {/* "once it matches you", not just "What RecallGuard does".
+                    Unqualified, the column implies severity is the only gate —
+                    and that a Class III recall of an allergen you track gets
+                    quietly buried, when in truth it would never have reached
+                    you unless it had already matched. The lead paragraph says
+                    this too; it is repeated here because a table gets scanned
+                    rather than read, and this is the cell a sceptical reader
+                    lands on first. */}
                 <th className="pb-3 text-xs uppercase tracking-[0.2em] text-graphite/60">
-                  What RecallGuard does
+                  What RecallGuard does once it matches you
                 </th>
               </tr>
             </thead>
@@ -1235,7 +1363,7 @@ const RecallGuard = () => {
         eyebrow="Pricing"
         title="One subscription, no free tier"
         className="text-center"
-      wideHeader
+        wideHeader
       >
         <div className="breakout mx-auto w-full max-w-[24rem] rounded-2xl border border-line bg-white/60 p-8">
           {/* The billing-term line is deliberately full-strength `text-graphite`
@@ -1268,7 +1396,11 @@ const RecallGuard = () => {
             while the reader is looking at the price. The second was cut on
             2026-08-12. If anything comes back here, it is what the subscription
             buys, never what it costs us. */}
-        <Paragraph className="mt-6">
+        {/* breakout so the Section's text-center centres this on the band and
+            therefore on the same axis as the mx-auto price card above it. In
+            the reading column it centred inside 33rem and sat visibly left of
+            the card. */}
+        <Paragraph className="breakout mt-6">
           Billing is handled by Apple. Cancel anytime from iOS Settings.
         </Paragraph>
       </Section>
