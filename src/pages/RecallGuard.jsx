@@ -93,28 +93,28 @@ const HERO_CHIPS = [
     title: "Checked, not just listed",
     detail: "Your pantry against every active recall",
     side: "left",
-    position: "xl:left-0 xl:top-[6%]",
+    position: "sm:left-0 sm:top-[6%]",
     drift: -70,
   },
   {
     title: "Two feeds",
     detail: "Yours is filtered to your state. All is everything.",
     side: "right",
-    position: "xl:right-0 xl:top-[27%]",
+    position: "sm:right-0 sm:top-[27%]",
     drift: 80,
   },
   {
     title: "Severity in plain English",
     detail: "And it says so when the FDA hasn't rated it yet",
     side: "left",
-    position: "xl:left-0 xl:top-[50%]",
+    position: "sm:left-0 sm:top-[50%]",
     drift: -35,
   },
   {
     title: "Pet food too",
     detail: "The animal-food feed, flagged with a paw",
     side: "right",
-    position: "xl:right-0 xl:top-[72%]",
+    position: "sm:right-0 sm:top-[72%]",
     drift: 95,
   },
 ];
@@ -500,16 +500,23 @@ const RecallGuard = () => {
               worth nothing. */}
           <HeroPhone chips={HERO_CHIPS} />
 
-          {/* Same four annotations below the phone once there is no room to
-              float them. A grid rather than the absolute layout above: at this
-              width they are a caption, and a caption reads in order.
+          {/* The same four annotations as a caption, on phones only, where
+              there is no room to float them beside the screenshot. From sm up
+              HeroPhone positions them in the gutters and this is hidden.
 
-              lg:col-start-2 is required, not cosmetic. This is the third direct
-              child of a two-column grid, so it would otherwise flow to row two
-              column one — under the COPY rather than under the phone — across
-              the whole 1024-1279px band, which is exactly the band where it is
-              the visible version of the annotations. */}
-          <ul className="mx-auto grid w-full max-w-[420px] grid-cols-1 gap-2 sm:max-w-none sm:grid-cols-2 lg:col-start-2 xl:hidden">
+              One set of chips, not two: this list and the floating ones render
+              from the same HERO_CHIPS array, so the copy cannot drift between
+              breakpoints. Both are in the DOM at every width and one is display
+              hidden, which does mean a screen reader at sm+ reaches the
+              floating set rather than this one — fine, since they read
+              identically.
+
+              It no longer needs lg:col-start-2. That existed to stop this
+              landing under the COPY column across the 1024-1279 band, which was
+              the band where it was the visible version. That band now floats.
+              If this is ever un-hidden above sm again, the col-start comes back
+              with it. */}
+          <ul className="mx-auto grid w-full max-w-[420px] grid-cols-1 gap-2 sm:hidden">
             {HERO_CHIPS.map((chip) => (
               <li key={chip.title}>
                 <Chip title={chip.title} detail={chip.detail} />
