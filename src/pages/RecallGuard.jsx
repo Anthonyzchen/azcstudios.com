@@ -1227,13 +1227,20 @@ const RecallGuard = () => {
           rather than as the opening of a new argument.
 
           The eyebrow names what the section decides ("what gets through")
-          rather than the feature it belongs to ("Alerts"), and the title is the
-          sharpest sentence the section already had: it was the lede, doing
-          headline work one size down. Its other half stays below as the
-          paragraph, so nothing was cut to make room. */}
+          rather than the feature it belongs to ("Alerts").
+
+          The title carries BOTH gates, which is the correction it exists for.
+          It replaced "A technicality never wakes you up." on 2026-08-25 —
+          accurate about the severity gate, silent about the preference one, and
+          vague ("technicality", and "wakes you up" implies night). Verified
+          against the app rather than the vault plan: the two gates are
+          find_matching_users_for_recall (state, allergens, pantry, categories —
+          whether a recall reaches you) and pushTreatmentForSeverity (loud /
+          silent / feed-only — how it arrives). A title that names only the
+          second reads as though severity alone decides everything. */}
       <Section
         eyebrow="What gets through"
-        title="A technicality never wakes you up."
+        title="You choose what reaches you. The severity decides how loudly."
         wideHeader
       >
         {/* The announcement-day story. A recall is public well before the FDA
@@ -1242,12 +1249,19 @@ const RecallGuard = () => {
             has four rows where the FDA only has three classes. Saying that out
             loud is the point: it is the coverage no competitor has, and the
             hedge is what makes claiming it honest. */}
+        {/* wide, so this runs the band like the table it introduces. It is a
+            caption on the exhibit below rather than running copy — the fourth
+            row it promises is visible while you read the sentence — and a lead
+            stopping at 33rem above a 1088px table read as a stray column. */}
         <div className="breakout mb-10">
-          <Paragraph>
-            A recall is public before it is graded, and the grade can take
-            weeks. RecallGuard reads the announcements the day they publish
-            rather than waiting, which is why there is a fourth row below that
-            the FDA does not have.
+          <Paragraph className="wide">
+            Every row below describes a recall that already matched your
+            household. What you track decides whether one reaches you at all;
+            the table is only about how it arrives once it has. A recall is also
+            public before it is graded, and the grade can take weeks, so
+            RecallGuard reads the announcements the day they publish rather than
+            waiting — which is why there is a fourth row here that the FDA does
+            not have.
           </Paragraph>
         </div>
 
@@ -1261,8 +1275,16 @@ const RecallGuard = () => {
                 <th className="pb-3 pr-6 text-xs uppercase tracking-[0.2em] text-graphite/60">
                   FDA meaning
                 </th>
+                {/* "once it matches you", not just "What RecallGuard does".
+                    Unqualified, the column implies severity is the only gate —
+                    and that a Class III recall of an allergen you track gets
+                    quietly buried, when in truth it would never have reached
+                    you unless it had already matched. The lead paragraph says
+                    this too; it is repeated here because a table gets scanned
+                    rather than read, and this is the cell a sceptical reader
+                    lands on first. */}
                 <th className="pb-3 text-xs uppercase tracking-[0.2em] text-graphite/60">
-                  What RecallGuard does
+                  What RecallGuard does once it matches you
                 </th>
               </tr>
             </thead>
