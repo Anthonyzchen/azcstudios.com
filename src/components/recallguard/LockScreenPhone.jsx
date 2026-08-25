@@ -41,8 +41,8 @@ const LOGICAL_HEIGHT = SCREEN_HEIGHT + BEZEL * 2;
  * this is what actually lands on the lock screen.
  */
 const PUSH = {
-  title: "Serious risk: Boar\'s Head Strassburger Brand Liverwurst",
-  body: "Listeria monocytogenes. Boar\'s Head Provisions Co. Tap for details.",
+  title: "Serious risk: Boar's Head Strassburger Brand Liverwurst",
+  body: "Listeria monocytogenes. Boar's Head Provisions Co. Tap for details.",
   // The day the FSIS notice published, and it really was a Thursday.
   date: "Thursday, July 25",
   time: "9:41",

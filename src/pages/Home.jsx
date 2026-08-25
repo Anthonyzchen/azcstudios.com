@@ -78,7 +78,12 @@ const Home = () => {
           <h1 className="mb-8 max-w-4xl font-Fraunces text-display font-normal text-ink">
             Software that earns its place on your phone.
           </h1>
-          <p className="max-w-prose text-lede text-graphite">
+          {/* prose is 33rem, tuned for the 0.95rem body size. This is text-lede,
+              which tops out at 1.3rem, so the same cap yields ~45 characters a
+              line and the paragraph reads as a narrow chunky block. 42rem lands
+              it back near 70 at that size. Measure is a character count, not a
+              pixel one — see the prose token in tailwind.config.js. */}
+          <p className="max-w-prose text-lede text-graphite lg:max-w-[42rem]">
             {STUDIO_NAME} builds consumer apps for people who want a tool to do
             one thing well and then get out of the way. No ads, no attention
             farming, no selling what we learn about you.
