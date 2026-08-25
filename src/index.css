@@ -55,3 +55,63 @@ html {
     transition-duration: 0.01ms !important;
   }
 }
+
+@layer components {
+  /* The section layout, inverted 2026-08-24.
+   *
+   * The page used to be a 68rem shell with every paragraph opting DOWN to a
+   * reading measure. Two failure modes fell out of that one default: miss a cap
+   * and a line runs to 106 characters, remember it and the paragraph strands
+   * alone in a full-width row. An audit found 19 stranded blocks, up to 704px
+   * of empty band beside a single paragraph.
+   *
+   * So the default flipped. The centre column IS the measure, text fills it and
+   * needs no cap at all, and the things that genuinely want the full band —
+   * stat grids, tables, the relay diagram, cards — opt OUT with `.breakout`.
+   *
+   * Named lines rather than nth-child rules so a block declares its own width
+   * where it is written, and adding a section cannot silently re-shuffle the
+   * ones around it. */
+  .section-grid {
+    display: grid;
+    grid-template-columns:
+      [full-start] minmax(0, 1fr)
+      [content-start] min(theme("maxWidth.prose"), 100%)
+      [content-end] minmax(0, 1fr)
+      [full-end];
+  }
+
+  .section-grid > * {
+    grid-column: content;
+  }
+
+  /* Full band, capped at the old content width and centred on the same axis as
+     the reading column, so prose sits as a consistent indent inside the
+     exhibits rather than drifting against them. */
+  .section-grid > .breakout {
+    grid-column: full;
+    width: 100%;
+    max-width: theme("maxWidth.content");
+    margin-inline: auto;
+  }
+
+  /* A breakout widens the BLOCK. It must never widen the reading measure.
+   *
+   * Learned the hard way: the first pass at this inversion removed every
+   * max-w-prose in the page on the reasoning that the column now provides it.
+   * True for text in the column, false for text inside a card that broke out —
+   * twelve paragraphs jumped straight back to 95-111 characters a line. The
+   * inversion had not fixed the problem, it had moved it from the sections into
+   * the cards.
+   *
+   * As a rule rather than a prop, because the whole point of the inversion is
+   * that nobody has to remember. A block declares that it is wide; its prose
+   * stays readable without being asked.
+   *
+   * A breakout that IS a paragraph is not matched — this is a descendant
+   * selector — which is exactly right for the source-citation lines. They are
+   * scanned, not read, and they are meant to span. */
+  .section-grid > .breakout :is(p, li, figcaption, dd, dt) {
+    max-width: theme("maxWidth.prose");
+  }
+}
