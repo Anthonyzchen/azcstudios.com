@@ -213,13 +213,15 @@ const CAPACITY_FIGURES = [
 ];
 
 // The toll is quoted from the CDC's final case count, not from the interim
+// CDC\'s FINAL counts, the outbreak having been declared over 2024-11-21. The
+// death count is not repeated here — the stat directly above carries it as
+// 2 -> 10.
 // numbers that circulated while the outbreak was open (an earlier report had
 // six deaths and 18 states).
 const OUTBREAK_TOLL = [
+  { figure: "61", label: "infected" },
+  { figure: "60", label: "hospitalized" },
   { figure: "19", label: "states" },
-  { figure: "27", label: "hospitalized" },
-  { figure: "7", label: "dead" },
-  { figure: "One", label: "pregnancy lost" },
 ];
 
 // The notification chain, drawn rather than described. The argument in this
@@ -322,7 +324,11 @@ const FAQS = [
   {
     question: "Where does the recall data come from?",
     answer:
-      "Two public government sources: the FDA, which covers most human food and animal food, and USDA FSIS, which covers meat, poultry, and egg products. RecallGuard reads both feeds on a schedule, extracts the product identifiers, and matches them against your profile and pantry. It does not republish, alter, or editorialize either agency's findings.",
+            // The second sentence is the same-day LIMIT, moved here on 2026-08-24
+      // when the "What's covered" card was cut. Keep it verbatim: it bounds the
+      // promise, claims.md bans real-time phrasing, and a limit is worth more
+      // words than a benefit. It was the only reason that card still existed.
+      "Two public government sources: the FDA, which covers most human food and animal food, and USDA FSIS, which covers meat, poultry, and egg products. Alerts land the same day the agency posts the recall, not the instant it happens: we poll the feeds on a schedule rather than claiming a real-time pipe we don't have. RecallGuard reads both feeds, extracts the product identifiers, and matches them against your profile and pantry. It does not republish, alter, or editorialize either agency's findings.",
   },
   {
     // Answers the objection without itemising costs. An earlier version broke
@@ -752,26 +758,57 @@ const RecallGuard = () => {
           <p className="mb-5 font-Inter text-eyebrow uppercase text-graphite/60">
             After the notice
           </p>
-          {/* h3, not h2. This card used to be its own Section with no title,
+        {/* THIS BLOCK ARGUES ONE THING AND MUST KEEP ARGUING IT: people kept
+            getting sick AFTER the recall was public. That is the gap RecallGuard
+            closes.
+
+            CASE CHOSEN 2026-08-24 over two larger candidates, and the reason is
+            the only thing that matters when picking a replacement:
+
+            THE TEST IS THE ONSET WINDOW, NOT THE CASE COUNT. Boar's Head illness
+            onsets ran late May to mid-September 2024 against a late-July recall —
+            roughly SEVEN WEEKS of new infections after the notice was public.
+            CDC only declares a listeria outbreak over 60 days past the last
+            illness, which is why the close came in November.
+
+            The Taylor Fresh lettuce cyclospora outbreak was tried here first and
+            pulled. Its numbers are far bigger (10,930 sick, 454 hospitalised) and
+            entirely accurate, but CDC puts its onsets at 22 June to 20 July
+            against a 17 July recall — THREE DAYS. Its rising count is reporting
+            lag, not new illness, so it argues the FDA's investigation lag, which
+            is the framing Anthony killed on 2026-08-14 because the product cannot
+            fix it. Bigger numbers, wrong argument. Do not reinstate it.
+
+            ACCURACY GUARDRAILS:
+            1. CDC declared this outbreak OVER on 2024-11-21, so these are final
+               figures, not a moving count. That is a feature: the page never goes
+               stale and never needs re-checking against a live investigation.
+            2. Two deaths were known at the recall, ten by the close. Say "eight
+               more died after", never that the later victims ate the meat in
+               defiance of the notice — the sources support the curve, not that.
+            3. Listeria incubates up to ~70 days, so do not pin any individual
+               death to a post-recall exposure. The claim is the ONSET WINDOW,
+               which is documented, and that is enough. */}}
+          {/*           {/* h3, not h2. This card used to be its own Section with no title,
               so its heading sat level with every other section heading. Folding
               it into "Why it matters" — which does render an h2 — made it a
               subsection, and the markup has to say so. */}
           <h3 className="mb-6 text-balance font-Fraunces text-2xl font-normal leading-tight text-ink sm:text-3xl">
-            The recall published in June 2025. People were still getting sick in
-            November.
+            The recall published in July. People were still getting sick in
+            September.
           </h3>
           <Paragraph className="mb-10">
-            Listeria in pre-cooked pasta, sold as prepared chicken fettuccine
-            alfredo at Walmart and Kroger. Seventeen people had been identified
-            when the recall went out. The count did not stop there.
+            Listeria in deli meat sliced at the counter, traced to one Boar\'s
+            Head plant in Jarratt, Virginia. Seven million pounds came off the
+            shelves. Two people had died when the recall went out.
           </Paragraph>
 
           <div className="mb-10 max-w-sm">
             <Stat
-              from="17"
-              to="28"
-              label="People infected, while a public recall notice existed the entire time"
-              period="At the June 2025 recall, to the final count"
+              from="2"
+              to="10"
+              label="People dead, while a public recall notice existed the entire time"
+              period="At the July 2024 recall, to the final count"
             />
           </div>
 
@@ -792,7 +829,7 @@ const RecallGuard = () => {
               reserved for classification state; these are outcomes, and a red
               "7 dead" would be the page raising its voice at the one place the
               facts do not need help. */}
-          <dl className="rule-top grid grid-cols-2 gap-x-8 gap-y-7 pt-8 sm:grid-cols-4">
+          <dl className="rule-top grid grid-cols-3 gap-x-8 gap-y-7 pt-8">
             {OUTBREAK_TOLL.map((item) => (
               <div key={item.label} className="flex flex-col-reverse">
                 <dt className="mt-1 text-[0.95rem] text-graphite">
@@ -815,8 +852,9 @@ const RecallGuard = () => {
           </Paragraph>
 
           <p className="mt-6 text-xs leading-relaxed text-graphite/80">
-            CDC, case counts as of June 18, 2025 and at the final update;
-            outbreak declared over February 2026.
+            CDC listeria outbreak investigation, deli meats, final update; USDA
+            FSIS recall notices, July 2024. Outbreak declared over 21 November
+            2024, so these are final counts.
           </p>
         </div>
       </Section>
