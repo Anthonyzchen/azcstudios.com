@@ -45,8 +45,14 @@ export const HeroPhone = ({ chips }) => {
       // someone has asked for less of it. Outside this block the chips sit at
       // their CSS defaults, which is visible and in position — the entrance
       // below must never be the only thing that makes them appear.
+      //
+      // KEEP THIS BREAKPOINT EQUAL TO THE ONE THE CHIPS FLOAT AT. It is `sm:`
+      // on [data-chip] in the markup below; the two are one decision written in
+      // two languages. They disagreed once — the query was left at 1280px while
+      // the markup moved to sm — and the result was chips that appeared on a
+      // 900px screen, correctly positioned, and simply never animated.
       mm.add(
-        "(min-width: 1280px) and (prefers-reduced-motion: no-preference)",
+        "(min-width: 640px) and (prefers-reduced-motion: no-preference)",
         () => {
           // Entrance: one chip at a time, each emerging from behind the phone.
           //
