@@ -23,14 +23,35 @@ import feedScreenshot from "../../assets/images/recallguard-feed.webp";
  * opinion about DOM adjacency, and it keeps the "hovering a chip must not move
  * that chip" behaviour that `group-hover` would have cost.
  *
- * At xl the box is wider than the screenshot it holds: the phone sits at 280px
- * in the middle and the chips live in the gutters either side, clipping the
- * phone's frame rather than covering the cards they point at. The arithmetic is
- * worth knowing before touching either number. The hero column is (68rem
- * content - 4rem gap) split by the grid; the asymmetric split in RecallGuard.jsx
- * leaves this side 592px, giving 156px gutters against a 176px chip, so each
- * overlaps by 20px of rounded frame. An even 50/50 split left 116px of gutter,
- * which put 60px of chip over the card text.
+ * The box is always wider than the screenshot it holds: the phone sits in the
+ * middle and the chips live in the gutters either side, clipping the phone's
+ * frame rather than covering the cards they point at.
+ *
+ * ONE set of numbers for every width the chips float at, and that is the point.
+ * There used to be three (sm, lg, xl), and each extra set was another pair free
+ * to drift apart — which is exactly what happened between the float breakpoint
+ * and the matchMedia query.
+ *
+ *   container   w-full, capped at 44rem / 704px
+ *   screenshot  calc(100% - 18rem) -> the container minus 288px
+ *   chip        9.5rem / 152px
+ *   gutter      144px a side, so a chip overlaps the frame by 8px
+ *
+ * The screenshot is a calc, not a fixed width, so it GROWS into whatever room
+ * the container has instead of being capped short of it. That was the bug this
+ * replaced: a fixed 220px screenshot sitting inside an 884px grid at 982px
+ * wide, throwing away 356px and rendering a phone barely half the size of a
+ * real one. It now reaches 416px wherever the container hits its cap; a real
+ * iPhone is 390.
+ *
+ * The cap and the calc are a pair. Raise the cap and the phone grows with it,
+ * while the gutters stay at 144 — the chip width is fixed and the calc
+ * subtracts a constant, so the geometry holds at every width in between.
+ *
+ * Below sm the chips do not float at all. 342px of usable width cannot hold a
+ * legible screenshot AND a chip either side, so RecallGuard.jsx renders the
+ * same four as a caption list under the phone. Decided 2026-08-25: on a phone a
+ * readable screenshot beats an anchored annotation.
  */
 export const HeroPhone = ({ chips }) => {
   const scopeRef = useRef(null);
@@ -131,7 +152,7 @@ export const HeroPhone = ({ chips }) => {
   return (
     <div
       ref={scopeRef}
-      className="relative mx-auto w-full max-w-[300px] sm:max-w-[33rem] xl:max-w-[37rem]"
+      className="relative mx-auto w-full max-w-[300px] sm:max-w-[44rem]"
     >
       <img
         src={feedScreenshot}
@@ -141,7 +162,7 @@ export const HeroPhone = ({ chips }) => {
         loading="eager"
         onMouseEnter={() => setPhoneHovered(true)}
         onMouseLeave={() => setPhoneHovered(false)}
-        className="mx-auto w-full max-w-[300px] rounded-[1.75rem] border border-line shadow-sm sm:max-w-[220px] xl:max-w-[280px]"
+        className="mx-auto w-full max-w-[300px] rounded-[1.75rem] border border-line shadow-sm sm:max-w-[calc(100%-18rem)]"
       />
 
       {chips.map((chip) => (
@@ -149,7 +170,7 @@ export const HeroPhone = ({ chips }) => {
           key={chip.title}
           data-chip
           data-drift={chip.drift}
-          className={`hidden sm:absolute sm:block sm:w-[9.5rem] xl:w-[11rem] ${chip.position}`}
+          className={`hidden sm:absolute sm:block sm:w-[9.5rem] ${chip.position}`}
         >
           <div
             data-chip-enter

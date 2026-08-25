@@ -390,7 +390,7 @@ const RecallGuard = () => {
             column keeps enough gutter for the annotation chips to sit beside
             the phone instead of on top of it. See the arithmetic in the comment
             above that box before changing either number. */}
-        <div className="mx-auto grid max-w-content items-center gap-12 lg:grid-cols-[minmax(0,24rem)_1fr] xl:grid-cols-[minmax(0,27rem)_1fr] xl:gap-16">
+        <div className="mx-auto grid max-w-content items-center gap-12 xl:max-w-[80rem] xl:grid-cols-[minmax(0,27rem)_1fr] xl:gap-16">
           <div>
             <div className="mb-8 flex items-center gap-3">
               <span
@@ -489,6 +489,23 @@ const RecallGuard = () => {
             </div>
           </div>
 
+          {/* TWO COLUMNS ONLY FROM xl, and the hero runs to 80rem there rather
+              than the 68rem the rest of the page uses. Both exist to give the
+              phone room.
+
+              The split used to start at lg, which left the phone side ~490px at
+              1024. That is LESS room than the same page has at 982 stacked, so
+              widening the browser made the screenshot shrink — it sat at 220px
+              against a real iPhone's 390. Stacking through 1279 keeps the phone
+              at its full size across the whole mid range; the cost is roughly
+              400px of extra hero height in that band, taken deliberately.
+
+              80rem at xl for the same reason: 27rem of copy plus a 4rem gap
+              plus the ~700px the phone and its chips need does not fit inside
+              68rem. The hero is the one section that earns the wider band —
+              everything below it is reading copy and stays at 68rem.
+
+          */}
           {/* The product, in the first screen. This used to be the editorial
               kitchen photo (now moved down to Why) on the rule that these
               photos are atmosphere and never product shots. That rule still
