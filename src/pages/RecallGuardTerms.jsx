@@ -46,24 +46,8 @@ const RecallGuardTerms = () => {
           Terms of Service
         </h1>
         <p className="text-sm text-graphite/70">
-          RecallGuard &mdash; Last updated July 29, 2026
+          RecallGuard &mdash; Last updated August 26, 2026
         </p>
-      </div>
-
-      {/* Draft warning */}
-      <div
-        role="note"
-        className="mb-10 rounded-2xl border border-line bg-paper-sunk p-5"
-      >
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-ink">
-          Draft &mdash; not legally reviewed
-        </p>
-        <Paragraph>
-          This is an MVP draft. Before public launch, an attorney will review
-          these Terms. The liability-limitation and medical-advice disclaimers
-          are especially important for a food-safety app and should be
-          validated.
-        </Paragraph>
       </div>
 
       {/* 1. Acceptance */}
@@ -134,8 +118,9 @@ const RecallGuardTerms = () => {
             18 should have a parent&apos;s or guardian&apos;s permission.
           </li>
           <li>
-            You are responsible for keeping your login credentials secure and
-            for all activity under your account.
+            You sign in with Apple or Google. Keeping that account secure is
+            your responsibility, and you are responsible for activity under
+            your RecallGuard account.
           </li>
           <li>One account per person. Do not share accounts.</li>
           <li>
@@ -154,8 +139,8 @@ const RecallGuardTerms = () => {
           subscription or trial.
         </Paragraph>
         <Paragraph className="mb-3">
-          <Term>Subscription price</Term>: $48.00 USD per year (subject to
-          change, with notice). Includes the full app &mdash; personalized
+          <Term>Subscription price</Term>: $4.00 per month, billed annually at
+          $48.00 USD per year (subject to change, with notice). Includes the full app &mdash; personalized
           recall feed by state, food category, and brand; persistent pantry via
           barcode scanning, receipt photo capture, or manual entry; push
           notifications when a recall affects products you&apos;ve added; and
@@ -168,20 +153,21 @@ const RecallGuardTerms = () => {
           annual rate.
         </Paragraph>
         <Paragraph className="mb-3">
-          <Term>Billing</Term>: Premium subscriptions are sold through the Apple
-          App Store or Google Play Store. Payment, renewal, and cancellation are
-          handled by those platforms according to their terms. You can manage or
-          cancel your subscription at any time in the App Store or Play Store
-          settings.
+          <Term>Billing</Term>: Subscriptions are sold through the Apple App
+          Store. Payment is charged to your Apple ID at confirmation of
+          purchase. Renewal and cancellation are handled by Apple according to
+          its terms, and you can manage or cancel at any time in your Apple ID
+          subscription settings.
         </Paragraph>
         <Paragraph className="mb-3">
-          <Term>Refunds</Term>: Refund requests are handled by the Apple App
-          Store or Google Play according to their policies. We are not able to
-          issue refunds directly.
+          <Term>Refunds</Term>: Refund requests are handled by Apple according
+          to its policies. We are not able to issue refunds directly.
         </Paragraph>
         <Paragraph className="mb-3">
           <Term>Renewals</Term>: Subscriptions automatically renew at the end of
           each term unless cancelled at least 24 hours before the renewal date.
+          Your Apple ID is charged for the renewal within 24 hours of the end of
+          the current term, at the price then in effect.
         </Paragraph>
         <Paragraph>
           <Term>Price changes</Term>: We may change subscription prices for
@@ -266,7 +252,13 @@ const RecallGuardTerms = () => {
         <SectionHeading>8. Third-party services</SectionHeading>
         <Paragraph>
           The App relies on third-party services (Supabase, Expo, Apple, Google,
-          Anthropic). Their terms and privacy policies govern those services.
+          RevenueCat, Resend, Anthropic, Go-UPC, PostHog, and Sentry &mdash; see
+          the{" "}
+          <Link to="/recallguard/privacy" className={linkClass}>
+            Privacy Policy
+          </Link>{" "}
+          for what each one receives). Their terms and privacy policies govern
+          those services.
           Outages or failures by those providers may affect the App; we are not
           liable for issues outside our reasonable control.
         </Paragraph>
@@ -334,8 +326,10 @@ const RecallGuardTerms = () => {
             floor only does work for someone who paid less (partial period,
             refund). Keep "greater of" — it is the consumer-favourable direction,
             and inverting it to "lesser of" is a materially different clause.
-            If the price moves, this moves with it. Attorney review outstanding
-            on whether a fixed floor is the right shape at all. */}
+            If the price moves, this moves with it. Never had an attorney pass;
+            whether a fixed floor is the right shape at all is still open. The
+            draft banner that used to flag that came off 2026-08-26 because it
+            was covering factual drift, not this. */}
         <Paragraph className="mb-3">
           Our total aggregate liability for any claim related to the App shall
           not exceed the greater of (a) $48.00 USD or (b) the amount you paid us
@@ -363,15 +357,17 @@ const RecallGuardTerms = () => {
       <section className="mb-10">
         <SectionHeading>12. Termination</SectionHeading>
         <Paragraph className="mb-3">
-          You may terminate your account at any time by emailing{" "}
-          <SupportEmail /> or by the in-app account deletion flow.
+          You may terminate your account at any time in the app via{" "}
+          <Term>Settings &rarr; Delete my account</Term>, or by emailing{" "}
+          <SupportEmail />. Deleting your account does not cancel your
+          subscription; cancel that in your Apple ID subscription settings.
         </Paragraph>
         <Paragraph>
           We may terminate or suspend your account at any time, with or without
           notice, for any reason, including violation of these Terms or harmful
           activity. On termination, your right to use the App ends. Sections of
           these Terms that by their nature should survive termination
-          (including Sections 9&ndash;11, 13, 15) will survive.
+          (including Sections 9&ndash;11, 13, 15, and 16) will survive.
         </Paragraph>
       </section>
 
@@ -430,9 +426,88 @@ const RecallGuardTerms = () => {
         </Bullets>
       </section>
 
-      {/* 16. Contact */}
+      {/* 16. Apple App Store terms — Apple's required minimum EULA terms
+           (Guideline 3.1.2 / Schedule A). These are not optional boilerplate:
+           shipping a custom EULA instead of pointing at Apple's standard one
+           obliges us to carry them. Do not trim. If the app ever adds
+           HealthKit, the Product Claims clause needs HealthKit named in it. */}
+      <section className="mb-10">
+        <SectionHeading>16. Apple App Store terms</SectionHeading>
+        <Paragraph className="mb-4">
+          RecallGuard is distributed through the Apple App Store, and Apple
+          requires the following terms to apply to your license. Where they
+          conflict with anything above, these control.
+        </Paragraph>
+        <Bullets>
+          <li>
+            <Term>This agreement is with us, not Apple.</Term> These Terms are
+            between you and {LEGAL_ENTITY} alone. Apple is not a party. We, not
+            Apple, are solely responsible for the App and its content.
+          </li>
+          <li>
+            <Term>Scope of licence</Term>: we grant you a non-transferable
+            licence to use the App on any Apple-branded product you own or
+            control, as permitted by the Usage Rules in the Apple Media Services
+            Terms and Conditions.
+          </li>
+          <li>
+            <Term>Maintenance and support</Term>: we are solely responsible for
+            it. Apple has no obligation to provide any maintenance or support
+            for the App.
+          </li>
+          <li>
+            <Term>Warranty</Term>: we are solely responsible for any product
+            warranties, whether express or implied by law, to the extent they
+            are not effectively disclaimed in Section 9. If the App fails to
+            conform to an applicable warranty, you may notify Apple and Apple
+            will refund the purchase price of the App to you. To the maximum
+            extent permitted by law, Apple has no other warranty obligation
+            whatsoever, and any other claims, losses, liabilities, damages,
+            costs, or expenses attributable to a failure to conform to a
+            warranty are our responsibility.
+          </li>
+          <li>
+            <Term>Product claims</Term>: we, not Apple, are responsible for
+            addressing any claim by you or a third party relating to the App or
+            your possession and use of it, including product liability claims,
+            any claim that the App fails to conform to a legal or regulatory
+            requirement, and claims arising under consumer protection, privacy,
+            or similar legislation.
+          </li>
+          <li>
+            <Term>Intellectual property</Term>: if a third party claims that the
+            App or your possession and use of it infringes their intellectual
+            property rights, we, not Apple, are solely responsible for the
+            investigation, defence, settlement, and discharge of that claim.
+          </li>
+          <li>
+            <Term>Legal compliance</Term>: you represent that you are not
+            located in a country subject to a U.S. Government embargo or
+            designated by the U.S. Government as a &quot;terrorist
+            supporting&quot; country, and that you are not listed on any U.S.
+            Government list of prohibited or restricted parties.
+          </li>
+          <li>
+            <Term>Third-party terms</Term>: you agree to comply with applicable
+            third-party terms when using the App.
+          </li>
+          <li>
+            <Term>Apple as third-party beneficiary</Term>: Apple and its
+            subsidiaries are third-party beneficiaries of these Terms. On your
+            acceptance, Apple has the right, and is deemed to have accepted the
+            right, to enforce these Terms against you as a third-party
+            beneficiary.
+          </li>
+          <li>
+            <Term>Questions, complaints, and claims</Term> about the App go to{" "}
+            {LEGAL_ENTITY} at <SupportEmail />.
+          </li>
+        </Bullets>
+      </section>
+
+      {/* 17. Contact */}
       <section className="rule-top pt-8">
-        <SectionHeading>16. Contact</SectionHeading>
+        <SectionHeading>17. Contact</SectionHeading>
         <Paragraph>
           Questions about these Terms: <SupportEmail />
         </Paragraph>
