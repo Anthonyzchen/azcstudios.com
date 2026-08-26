@@ -37,7 +37,7 @@ const RecallGuardPrivacy = () => {
   }, []);
 
   return (
-    <div ref={entranceRef} className="mx-auto max-w-prose px-gutter py-16">
+    <div ref={entranceRef} className="mx-auto max-w-content px-gutter py-16">
       {/* Header */}
       <div className="mb-10">
         <Link

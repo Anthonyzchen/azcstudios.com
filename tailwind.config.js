@@ -36,9 +36,16 @@ export default {
         // the 65-75 where the eye reliably finds the next line without
         // re-reading. 33rem lands near 70.
         //
-        // This is the one token that fixes every capped paragraph on the site
-        // at once, legal pages included, where a long measure is worse rather
-        // than better. Seven files consume it.
+        // MEASURE ONLY. This token caps a line of running text; it is not a
+        // page width. That distinction was learned on 2026-08-26: the legal
+        // pages used `max-w-prose` as their whole SHELL, so narrowing the
+        // measure for the RecallGuard grid silently shrank four unrelated
+        // pages from 42rem to 33rem — headings, cards and bullets included,
+        // none of which are running text. They use `content` now. If a new
+        // page needs an outer width, reach for `content`, never this.
+        //
+        // Live consumers: the .section-grid column and its breakout descendant
+        // rule in index.css, and the Home lede.
         //
         // If you widen it again, widen the type with it. The two are a pair:
         // measure is a character count, not a pixel count, so a wider column is
