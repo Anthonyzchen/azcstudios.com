@@ -611,15 +611,29 @@ const RecallGuard = () => {
         title="The system that catches this is getting smaller."
         wideHeader
       >
-        {/* A breakout DIV, not a breakout Paragraph. The div spans the band and
-            left-aligns to the tile grid below; the descendant measure rule caps
-            the text inside it. Putting `breakout` on the Paragraph itself would
-            widen the text to 1088px, which is ~140 characters a line. */}
+        {/* A breakout DIV so the block left-aligns to the tile grid below.
+            The Paragraph inside takes `wide`, which releases it from the
+            descendant measure rule and runs it the full 1088px band.
+
+            That IS ~140 characters a line, and this comment used to argue
+            against it. Anthony asked for the band on 2026-08-26 and it holds
+            here for a reason the general rule can't see: two sentences set as
+            one long line reads as a caption over the tile grid, which is what
+            it is. Do not take it as licence for the multi-paragraph copy
+            elsewhere on the page, where 140 characters a line is exactly the
+            failure the measure rule exists to prevent.
+
+            "a single recall" lost its "single" on 2026-08-26: at the band the
+            sentence measured 1116px against a 1088px box and orphaned the word
+            "become." onto a second line. The cut costs emphasis, not meaning —
+            the indefinite article already scopes it to one recall — and it
+            leaves ~19px of slack, so treat this line as at its length limit
+            and re-measure before adding to it. */}
         <div className="breakout mb-10">
-          <Paragraph>
+          <Paragraph className="wide">
             The number of recalls barely moved: 296 in 2024, 320 in 2025. What
-            changed is how many people are watching, and how large a single
-            recall has become.
+            changed is how many people are watching, and how large a recall has
+            become.
           </Paragraph>
         </div>
 
@@ -822,7 +836,11 @@ const RecallGuard = () => {
             The recall published in July. People were still getting sick in
             September.
           </h3>
-          <Paragraph className="mb-10">
+          {/* wide, like the thesis paragraph that closes this card. Same
+              reasoning: a lede under a heading, short enough to survive the
+              band, and leaving it at 33rem inside a full-width card put a
+              ragged column of text under a heading that spans. */}
+          <Paragraph className="wide mb-10">
             Listeria in deli meat sliced at the counter, traced to one Boar's
             Head plant in Jarratt, Virginia. Seven million pounds came off the
             shelves. Two people had died when the recall went out.
@@ -850,29 +868,40 @@ const RecallGuard = () => {
             />
           </div>
 
-          {/* flex-col-reverse, not an sr-only term: the label is the <dt> and
+          {/* flex-row-reverse, not an sr-only term: the label is the <dt> and
               the figure is the <dd>, which is the pairing a screen reader wants
-              ("dead, 7"), while the reversed column still paints the number
-              above its label. Hiding a duplicate <dt> instead would announce
-              every label twice. */}
-          {/* A grid, not a wrapping flex row. As a flex row these four sat in
-              416px of a 1006px container and left 590px of dead space to the
-              right — the numbers read as a left-clustered fragment rather than
-              as the toll of one event. Four equal columns make them a unit.
+              ("hospitalized, 60"), while the reversed row still paints the
+              number ahead of its label. Hiding a duplicate <dt> instead would
+              announce every label twice.
 
-              Two columns below sm, because "One / pregnancy lost" needs room to
-              wrap without stranding a word.
+              Reversed ROW rather than column: stacked, the figure and its noun
+              read as two separate registers and the eye has to pair them back
+              up. Set on one baseline they read as the phrase a person would
+              actually say — "60 hospitalized" — which is the unit the sentence
+              above is already asking the reader to hold. justify-end is
+              correct despite the name: on a reversed main axis it packs the
+              pair to the left edge of its cell. */}
+          {/* A grid, not a wrapping flex row. As a flex row these sat in 416px
+              of a 1006px container and left 590px of dead space to the right —
+              the numbers read as a left-clustered fragment rather than as the
+              toll of one event. Three equal columns make them a unit.
+
+              One column below sm: an inline pair is roughly twice as wide as
+              the bare figure was, and three of them across a phone would wrap
+              "hospitalized" off its own number. Stacked, each pair still reads
+              as one line.
 
               No colour on the figures, deliberately. The severity ramp is
               reserved for classification state; these are outcomes, and a red
               "7 dead" would be the page raising its voice at the one place the
               facts do not need help. */}
-          <dl className="rule-top grid grid-cols-3 gap-x-8 gap-y-7 pt-8">
+          <dl className="rule-top grid grid-cols-1 gap-x-8 gap-y-4 pt-8 sm:grid-cols-3 sm:gap-y-7">
             {OUTBREAK_TOLL.map((item) => (
-              <div key={item.label} className="flex flex-col-reverse">
-                <dt className="mt-1 text-[0.95rem] text-graphite">
-                  {item.label}
-                </dt>
+              <div
+                key={item.label}
+                className="flex flex-row-reverse items-baseline justify-end gap-2"
+              >
+                <dt className="text-[0.95rem] text-graphite">{item.label}</dt>
                 <dd className="font-Fraunces text-3xl text-ink">
                   {item.figure}
                 </dd>
@@ -881,8 +910,19 @@ const RecallGuard = () => {
           </dl>
 
           {/* The thesis of the whole page, and the one sentence that has to
-              survive any future edit. */}
-          <Paragraph className="mt-10">
+              survive any future edit.
+
+              `wide` releases it from the 33rem measure the breakout rule caps
+              prose at, so it runs the card's full ~63rem band. That is the
+              opt-out the CSS explicitly reserves for short blocks and warns off
+              for body copy, and this is the one paragraph on the page that
+              earns it: four short sentences ending in the claim the whole page
+              exists to make. At the measure it read as a footnote tucked into
+              the left half of a full-width card; spanning the card, it reads as
+              the card's conclusion. Do not spread the habit to the running copy
+              above it — those are read at length and would hit 100+ characters
+              a line. */}
+          <Paragraph className="wide mt-10">
             The notice was public that entire time. It was posted to a
             government feed and picked up for a day. It never reaches the people
             with the food already in their refrigerator. Published is not the
@@ -1065,18 +1105,6 @@ const RecallGuard = () => {
             ))}
           </ol>
 
-          {/* Concede the retailer programs rather than ignore them. Anyone who
-              shops at Costco has had one of these letters, and a reader who
-              knows the exception discounts the whole diagram if it pretends the
-              exception doesn't exist. Naming it and then naming its limits is
-              what makes the paragraph below land. */}
-          <p className="mx-auto mt-4 max-w-[34rem] text-center text-xs leading-relaxed text-graphite">
-            A few chains do write to buyers off loyalty or membership records.
-            It is voluntary, it only reaches you if you used the card at that
-            chain, and PIRG graded 22 of the 26 largest US chains as failing on
-            recall communication.
-          </p>
-
           {/* No figcaption. It used to close with "So the food leaves the shelf
               and the notice sits in a federal feed..." — cut 2026-08-25 because
               the diagram had already said it: the required chain ends at the
@@ -1088,8 +1116,7 @@ const RecallGuard = () => {
 
         <p className="breakout mt-8 text-xs leading-relaxed text-graphite/80">
           21 CFR 117.139 (recall plan requirements); FDA statement, January
-          2025; US PIRG Education Fund, Food for Thought 2026 and Food Recall
-          Failure (2020) for the supermarket grades.
+          2025; US PIRG Education Fund, Food for Thought 2026.
         </p>
       </Section>
 
