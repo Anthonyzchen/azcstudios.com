@@ -121,9 +121,12 @@ const RecallGuardPrivacy = () => {
           <li>
             <Term>Receipt content</Term> &mdash; if you photograph a receipt, the
             line-item text extracted from it, plus the retailer name when it can
-            be identified. <Term>The photo itself is never stored.</Term> It is
-            sent once for text extraction and discarded when the response comes
-            back; only the extracted lines are saved.
+            be identified. <Term>RecallGuard never stores the photo.</Term> It is
+            sent once to Anthropic for text extraction and discarded when the
+            response comes back; only the extracted lines are saved. Sending it
+            requires your permission, which RecallGuard asks for the first time
+            you scan a receipt and which you can withdraw at any time in
+            Settings under Privacy.
           </li>
         </Bullets>
 
@@ -303,7 +306,7 @@ const RecallGuardPrivacy = () => {
                   Claude Haiku Vision for receipt line-item extraction
                 </td>
                 <td className="px-4 py-3">
-                  The receipt image, sent once and not retained by Anthropic per their API terms. Not linked to your account
+                  The receipt image, sent once. Anthropic deletes it within 30 days and does not use it to train models, per their API terms. Not linked to your account
                 </td>
               </tr>
               <tr className="border-t border-line">
@@ -518,6 +521,14 @@ const RecallGuardPrivacy = () => {
           analytics, crash and performance diagnostics, and the first-time
           setup screen recording. The app works exactly the same either way, and nothing
           about your subscription or your alerts changes.
+        </Paragraph>
+        <SubHeading>Turn off AI receipt reading</SubHeading>
+        <Paragraph className="mb-4">
+          <Term>Settings &rarr; Privacy &rarr; Read receipts with AI.</Term>{" "}
+          RecallGuard asks for this the first time you scan a receipt, and it is
+          off until you allow it. Turning it off stops receipt photos being sent
+          to Anthropic; barcode scanning and adding items by hand are unaffected
+          and never involved Anthropic in the first place.
         </Paragraph>
         <SubHeading>Delete your account</SubHeading>
         <Paragraph className="mb-4">
