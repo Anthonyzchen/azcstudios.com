@@ -2,12 +2,42 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "azcstudios-com",
   "compatibility_date": "2026-07-26",
+  // This was an assets-only project until shared recall links needed Open Graph
+  // tags in the server response — see the header of src/worker.js for why a
+  // client-side route cannot produce them. Every path the Worker does not claim
+  // still falls through to the assets binding untouched.
+  "main": "src/worker.js",
   "assets": {
     "directory": "./dist/",
+    // Named so the Worker can reach it as env.ASSETS.
+    "binding": "ASSETS",
+    // Without this, the recall route works for link crawlers and breaks for
+    // people — the exact opposite of what you would catch by testing with curl.
+    //
+    // The asset router runs ahead of the Worker, and `not_found_handling`
+    // claims any request carrying `Sec-Fetch-Mode: navigate`, which every real
+    // browser navigation sends and curl sends for nothing. So a shared link
+    // unfurled correctly in iMessage and then rendered the SPA's 404 page when
+    // someone tapped it.
+    //
+    // Scoped to the two paths the Worker actually owns. Everything else keeps
+    // the fast path straight to assets, so the landing and legal pages are
+    // served exactly as they were before this file gained a `main`.
+    "run_worker_first": ["/recallguard/r/*", "/.well-known/apple-app-site-association"],
     // Serves index.html for any path that isn't a real file, so client-side
     // routes like /recallguard/privacy survive a hard refresh. This is the
     // Workers-native replacement for the `/* /index.html 200` line that a
     // Cloudflare Pages project would carry in public/_redirects.
     "not_found_handling": "single-page-application"
   }
+  // SUPABASE_URL and SUPABASE_ANON_KEY are NOT declared here. They are set as
+  // Worker runtime variables in the Cloudflare dashboard (Settings ->
+  // Variables), the same place the VITE_* pair lives — but these are a separate
+  // pair. VITE_* are *build* variables, baked into the client bundle by Vite and
+  // invisible to Worker code at runtime.
+  //
+  // Locally, put them in .dev.vars (gitignored) for `wrangler dev`.
+  //
+  // A deploy without them does not break the site: the recall route returns an
+  // honest "we could not load this recall", and everything else is unaffected.
 }

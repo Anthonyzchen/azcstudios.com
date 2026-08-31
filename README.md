@@ -25,6 +25,7 @@ npm run lint
 | `/recallguard/privacy` | Privacy Policy (canonical) |
 | `/recallguard/terms` | Terms of Service (canonical) |
 | `/recallguard/support` | Support + FAQ (App Store requires this URL) |
+| `/recallguard/r/<fda_id>` | A single recall, rendered by the Worker for sharing |
 
 `anthonyzchen.com/apps/recallguard*` 301s here. Those legal URLs used to be
 canonical on the personal site; this repo owns them now.
@@ -52,7 +53,9 @@ properties share one easing curve and duration scale. Import `EASE` /
 
 ## Deployment
 
-Cloudflare **Workers** (static assets), auto-deploying on push to `main`.
+Cloudflare **Workers**, auto-deploying on push to `main`. This was an
+assets-only project until `src/worker.js` arrived; see that file's header for
+why shared recall links need a server.
 Not Pages — Cloudflare's dashboard no longer offers a Pages option when
 connecting a new Git repo, so this project takes the Workers path even though
 `anthonyzchen.com` predates that change and remains a Pages project.
@@ -74,6 +77,25 @@ is what makes a hard refresh on `/recallguard/privacy` work — it's the Workers
 equivalent of the `/* /index.html 200` line a Pages project keeps in
 `public/_redirects`. That file was removed; do not add it back unless this
 moves to Pages, since two competing fallback declarations is worse than one.
+
+`run_worker_first` in the same file is not optional decoration. The asset router
+runs ahead of the Worker and claims anything carrying `Sec-Fetch-Mode: navigate`,
+which every browser navigation sends and `curl` sends for nothing — so without
+it a recall link unfurls correctly in iMessage and then serves the SPA's 404 to
+whoever taps it. Test that route with a browser, or with
+`curl -H "Sec-Fetch-Mode: navigate"`; a plain `curl` will pass either way.
+
+### Worker variables
+
+The recall route reads `SUPABASE_URL` and `SUPABASE_ANON_KEY` at **runtime**.
+These are a separate pair from the `VITE_*` variables the waitlist form uses:
+those are build variables, baked into the client bundle by Vite and invisible to
+Worker code. Set both pairs in the dashboard under Settings → Variables, and
+mirror the runtime pair into a local `.dev.vars` (gitignored) for
+`npx wrangler dev`.
+
+A deploy missing them does not break the site. The recall route returns an
+honest "we could not load this recall" and everything else is untouched.
 
 Custom domains attach at Worker → Settings → Domains & Routes → Add → Custom
 Domain, which writes the DNS record automatically. **Apex and `www` are
