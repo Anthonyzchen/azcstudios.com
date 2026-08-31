@@ -295,6 +295,28 @@ const firmLine = (row) => {
   return SOURCE_LABEL_PATTERN.test(firm) ? "" : firm;
 };
 
+/**
+ * The category line under the product name, dropped when it just restates it.
+ *
+ * On a lot of rows product_type is a lowercased echo of the title: the
+ * jalapeno recall carries the title "Fresh Jalapeno Peppers" and the type
+ * "fresh jalapeno peppers", which rendered as the same words twice, once in
+ * display type and once in small grey. It earns its line only when it adds a
+ * category the headline does not already contain.
+ */
+const productTypeLine = (row, title) => {
+  const type = cleanDescription(row.product_type);
+  if (!type) return "";
+  const norm = (text) =>
+    text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  const t = norm(type);
+  const inTitle = norm(title);
+  return !t || inTitle === t || inTitle.includes(t) ? "" : type;
+};
+
 /** The stated hazard, falling back to the raw FDA reason. Null on ~11% of rows. */
 const hazardLine = (row) =>
   cleanDescription(row.hazard) || cleanDescription(row.reason);
@@ -493,11 +515,17 @@ const shell = ({ title, description, image, canonical, accent, body }) => `<!doc
   }
   .row p { margin: 0.4rem 0 0; }
   .row p + p { margin-top: 0.55rem; color: var(--graphite); }
+  /* Full-bleed with a bottom rule, matching the same notice in the app, which
+     app/recall/[id].tsx renders as border-b + border-rule + bg-surface-muted
+     with px-6 py-4. It sat inset and rounded here, which read as an aside rather
+     than as part of the banner it qualifies — and this notice is the one that
+     stops a reader mistaking our inferred severity for an FDA verdict, so it
+     should carry the same weight as the band above it. */
   .pending {
-    margin: 0 1.5rem;
-    padding: 0.9rem 1rem;
+    margin: 0;
+    padding: 1rem 1.5rem;
     background: var(--paper-sunk);
-    border-radius: 8px;
+    border-bottom: 1px solid var(--line);
     font-size: 0.9rem;
     color: var(--graphite);
   }
@@ -554,6 +582,7 @@ const renderRecall = (row) => {
   const label = severityLabel(row);
   const firm = firmLine(row);
   const title = productTitle(row, firm);
+  const productType = productTypeLine(row, title);
   const hazard = hazardLine(row);
   const action = actionFor(row);
   const canonical = `${SITE}${RECALL_PREFIX}${row.fda_id}`;
@@ -573,7 +602,7 @@ const renderRecall = (row) => {
     <div class="sev">${esc(label ?? row.classification)}</div>
     ${firm ? `<div class="firm">${esc(firm)}</div>` : ""}
     <h1>${esc(title)}</h1>
-    ${row.product_type ? `<div class="type">${esc(cleanDescription(row.product_type))}</div>` : ""}
+    ${productType ? `<div class="type">${esc(productType)}</div>` : ""}
   </div>
   ${
     isPending(row.classification)

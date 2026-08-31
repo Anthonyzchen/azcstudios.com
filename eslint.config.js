@@ -8,7 +8,11 @@ export default [
   // Global ignore. In flat config an `ignores` key alongside `files` only
   // narrows that one config block — build output is skipped project-wide only
   // when `ignores` stands alone.
-  { ignores: ['dist/**'] },
+  // `.wrangler` holds the dev server's generated bundle. Without it here, any
+  // lint run after a `wrangler dev` session reports errors in Cloudflare's own
+  // generated middleware facade, which look like they belong to src/worker.js
+  // and do not.
+  { ignores: ['dist/**', '.wrangler/**'] },
   {
     files: ['**/*.{js,jsx}'],
     languageOptions: {
