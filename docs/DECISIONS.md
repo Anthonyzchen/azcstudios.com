@@ -9,6 +9,26 @@ not by which product it serves.
 
 ---
 
+## 2026-08-31 — The privacy policy states Anthropic's real 30-day retention
+
+`fix/rg-privacy-retention` · `23e00aa` · `src/pages/RecallGuardPrivacy.jsx`
+
+**Decision:** the recipients table says receipt images are deleted by Anthropic
+within 30 days and never used for training, rather than "not retained." Section 8
+gains the revocation route for the in-app consent toggle.
+
+**Why:** the previous wording was false. Anthropic's documented default for API
+inputs is deletion within 30 days; zero data retention is a separate opt-in
+agreement RecallGuard does not hold. A published policy that overstates the
+protection is a deceptive practice under FTC Act Section 5 and breaks the accuracy
+requirement in App Store Guideline 5.1.1(i) — which made it a live exposure, unlike
+the missing consent screen it was found alongside, since this page was already
+serving to the public.
+
+If a zero-retention agreement is ever signed, this sentence and the consent sheet
+copy in `recall-guard` (`components/ReceiptConsentSheet.tsx`) change together, or
+one of them becomes false again.
+
 ## 2026-08-30 — Shared recall links are served by our own Worker, not a link service
 
 `feature/recall-share-links` · `src/worker.js`, `wrangler.jsonc`,
