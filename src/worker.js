@@ -106,6 +106,7 @@ const COLUMNS = [
   "product_type",
   "hazard",
   "reason",
+  "distribution_pattern",
   "severity",
   "classification",
   "superseded_by",
@@ -175,6 +176,38 @@ const severityLabel = (row) => {
 
 const actionFor = (row) =>
   isPending(row.classification) ? PENDING_ACTION : severityFor(row.severity).action;
+
+/**
+ * Hazards that survive on a surface, where the container and the shelf matter
+ * as much as the food.
+ *
+ * Mirrored from isPathogenHazard in recall-guard/app/recall/[id].tsx, which is
+ * itself kept narrower than NAMED_HAZARD_REGEX in the edge functions on purpose:
+ * it asks "can this live on a countertop", not "is this acute", so foreign
+ * material, sulfites and lead stay out. Keep the three in step.
+ *
+ * Worth the copy where the title heuristics were not: this gates real FDA
+ * cleaning guidance, and pathogen recalls are the ones people actually forward.
+ */
+const isPathogenHazard = (text) =>
+  /listeria|salmonell|e\.?\s?coli|escherichia|o157|stec|shigell|cyclospora|campylobacter|vibrio|clostridium|botulinum|botulism|cronobacter|hepatitis|norovirus|bacillus/i.test(
+    text
+  );
+
+/**
+ * Where it was sold, in the FDA's own words.
+ *
+ * The app parses this column into a headline, a sorted state list and the
+ * reader's own states in bold, through the 308-line lib/pure/distribution.ts.
+ * None of that is mirrored here. The raw column is already legible prose ("MI,
+ * NY", "US States AL, FL, GA, KY..."), and the app itself keeps the verbatim
+ * string alongside its parsed version precisely because the derived line "drops
+ * the part that often settles it" — which store, which website.
+ *
+ * Never truncated. This is the field that answers "does this affect me", and a
+ * cut state list is worse than a long one.
+ */
+const soldInLine = (row) => cleanDescription(row.distribution_pattern);
 
 /** Solid art for a graded recall, hatched art for one the FDA has not rated. */
 const severityImage = (row) => {
@@ -428,7 +461,7 @@ const shell = ({ title, description, image, canonical, accent, body }) => `<!doc
 <meta name="twitter:image" content="${esc(SITE + image)}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600&family=Inter:wght@400;500;600&display=swap">
 <style>
   :root {
     --paper: #FAF8F4;
@@ -455,8 +488,16 @@ const shell = ({ title, description, image, canonical, accent, body }) => `<!doc
     margin: 0 auto;
     padding: 1.5rem 1.25rem 0;
   }
+  /* The card is set in the app's display face, not the studio site's Fraunces.
+     It is a RecallGuard artifact that most readers meet before they have any
+     idea what AZC Studios is, so it should look like the product it is
+     advertising. The app made the same move away from a serif for its own
+     reasons: the note in recall-guard/tailwind.config.js retired Lora as "an
+     editorial serif that only ever appeared as titles and never structured
+     anything beneath them", replaced by Inter Tight, which "carries the same
+     hierarchy without the costume". */
   .masthead a {
-    font-family: Fraunces, Georgia, serif;
+    font-family: "Inter Tight", Inter, system-ui, sans-serif;
     font-size: 1.25rem;
     font-weight: 600;
     letter-spacing: -0.02em;
@@ -493,7 +534,7 @@ const shell = ({ title, description, image, canonical, accent, body }) => `<!doc
   }
   .band h1 {
     margin: 0.15rem 0 0;
-    font-family: Fraunces, Georgia, serif;
+    font-family: "Inter Tight", Inter, system-ui, sans-serif;
     font-size: clamp(1.6rem, 5vw, 2.1rem);
     font-weight: 600;
     line-height: 1.12;
@@ -584,7 +625,11 @@ const renderRecall = (row) => {
   const title = productTitle(row, firm);
   const productType = productTypeLine(row, title);
   const hazard = hazardLine(row);
+  const soldIn = soldInLine(row);
   const action = actionFor(row);
+  // Read across the hazard and the raw FDA reason, since the normalized hazard
+  // sometimes says "bacterial contamination" where only `reason` names the bug.
+  const pathogen = isPathogenHazard(`${hazard} ${row.reason ?? ""}`);
   const canonical = `${SITE}${RECALL_PREFIX}${row.fda_id}`;
   const reported = formatDate(row.report_date);
 
@@ -611,10 +656,12 @@ const renderRecall = (row) => {
   }
   <div class="rows">
     ${hazard ? `<div class="row"><div class="label">The problem</div><p>${esc(hazard)}</p></div>` : ""}
+    ${soldIn ? `<div class="row"><div class="label">Where it was sold</div><p>${esc(soldIn)}</p></div>` : ""}
     <div class="row">
       <div class="label">What to do</div>
       <p>${esc(action)}</p>
       <p>Throw it away in a sealed bag so pets and wildlife cannot get to it. If it is unopened and you want your money back, most stores refund recalled items without a receipt.</p>
+      ${pathogen ? `<p>Wash anything it touched, including containers, shelves, counters and your hands, with hot soapy water.</p>` : ""}
     </div>
   </div>
   <div class="actions">
