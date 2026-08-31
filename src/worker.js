@@ -54,6 +54,15 @@ const APPLE_APP_ID = "W6A7W47YE4.com.anthonyzchen.recallguard";
  * `pending` is the hedged label for rows the FDA has published but not graded.
  * On those, severity is our own read of the hazard text rather than an FDA
  * verdict, so the urgency stays and the certainty does not.
+ *
+ * The preview images follow components/SeverityStripe.tsx in the app, whose
+ * rule is **hue carries danger, fill carries certainty**: a graded recall gets a
+ * solid field, an ungraded one gets the same hue under a 45° hatch. Without the
+ * separate `imagePending` art, an inferred "possible serious risk" would arrive
+ * in the message thread pixel-identical to a confirmed Class I, with the whole
+ * hedge resting on one word — the exact failure that stripe was built to fix.
+ *
+ * Tier 1 has no pending variant because severityFromHazardText floors at 2.
  */
 const SEVERITY = {
   3: {
@@ -61,6 +70,7 @@ const SEVERITY = {
     pending: "Possible serious risk",
     color: "#c8102e",
     image: "/og/recall-sev-3.png",
+    imagePending: "/og/recall-sev-3-pending.png",
     action: "Stop using this product now. Do not eat it.",
   },
   2: {
@@ -68,6 +78,7 @@ const SEVERITY = {
     pending: "Possible risk",
     color: "#a8630a",
     image: "/og/recall-sev-2.png",
+    imagePending: "/og/recall-sev-2-pending.png",
     action: "Stop using this product.",
   },
   1: {
@@ -76,6 +87,7 @@ const SEVERITY = {
     pending: "Possible risk",
     color: "#57574f",
     image: "/og/recall-sev-1.png",
+    imagePending: "/og/recall-sev-1.png",
     action:
       "Check the lot code on your package against the affected range in the FDA record. If it matches, stop using it.",
   },
@@ -163,6 +175,12 @@ const severityLabel = (row) => {
 
 const actionFor = (row) =>
   isPending(row.classification) ? PENDING_ACTION : severityFor(row.severity).action;
+
+/** Solid art for a graded recall, hatched art for one the FDA has not rated. */
+const severityImage = (row) => {
+  const tier = severityFor(row.severity);
+  return isPending(row.classification) ? tier.imagePending : tier.image;
+};
 
 /**
  * Trim a raw FDA product_description down to something that reads as a name.
@@ -595,7 +613,7 @@ const renderRecall = (row) => {
   return shell({
     title: ogTitle,
     description: ogDescription,
-    image: tier.image,
+    image: severityImage(row),
     canonical,
     accent: tier.color,
     body,
