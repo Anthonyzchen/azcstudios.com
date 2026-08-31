@@ -345,7 +345,9 @@ const fetchRecall = async (env, filter) => {
   });
 
   if (!response.ok) {
-    throw new Error(`PostgREST responded ${response.status}`);
+    const error = new Error(`PostgREST responded ${response.status}`);
+    error.upstreamStatus = response.status;
+    throw error;
   }
 
   const rows = await response.json();
@@ -632,7 +634,20 @@ const renderNotice = ({ heading, body, fdaId }) => {
   });
 };
 
-const html = (markup, status, cacheSeconds) =>
+/**
+ * `diagnostic` names which failure branch produced the page, as an
+ * `x-recall-status` header.
+ *
+ * Both 503 branches — no credentials, and an upstream that answered badly —
+ * render the same page on purpose: a visitor does not need our plumbing
+ * explained. But that also made the two indistinguishable from outside, which
+ * cost a debugging cycle on the first deploy when the runtime variables had not
+ * landed. The header is invisible to readers and decisive with one `curl -I`,
+ * which matters because this project has Workers Observability switched off.
+ *
+ * It carries a branch name and an HTTP status, never a URL, key or row.
+ */
+const html = (markup, status, cacheSeconds, diagnostic) =>
   new Response(markup, {
     status,
     headers: {
@@ -643,6 +658,7 @@ const html = (markup, status, cacheSeconds) =>
       "cache-control": cacheSeconds
         ? `public, max-age=300, s-maxage=${cacheSeconds}`
         : "no-store",
+      ...(diagnostic ? { "x-recall-status": diagnostic } : {}),
     },
   });
 
@@ -668,7 +684,8 @@ const handleRecall = async (request, env, ctx) => {
         body: "We could not read a recall reference from this address. Check the link, or open RecallGuard to search the current recalls.",
       }),
       404,
-      0
+      0,
+      "bad-reference"
     );
   }
 
@@ -703,7 +720,10 @@ const handleRecall = async (request, env, ctx) => {
         fdaId,
       }),
       503,
-      0
+      0,
+      error?.upstreamStatus
+        ? `upstream-${error.upstreamStatus}`
+        : `upstream-unreachable-${error?.name ?? "error"}`
     );
   }
 
@@ -715,7 +735,8 @@ const handleRecall = async (request, env, ctx) => {
         fdaId,
       }),
       404,
-      0
+      0,
+      "not-found"
     );
   }
 
@@ -777,7 +798,8 @@ export default {
             body: "Something went wrong on our end, so we are not going to guess. This does not mean the product is safe — check the FDA record directly.",
           }),
           503,
-          0
+          0,
+          "no-credentials"
         );
       }
       return handleRecall(request, env, ctx);
