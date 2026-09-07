@@ -9,6 +9,28 @@ not by which product it serves.
 
 ---
 
+## 2026-09-06 — The policy discloses purchase facts, and still says the photo is never stored
+
+`fix/rg-privacy-purchase-facts` · `src/pages/RecallGuardPrivacy.jsx`
+
+**Decision:** section 1 now names the prices, quantities, subtotal, item count,
+store number and purchase date read off a receipt, plus the corrections a user
+makes to a misread line. Section 3 says why the figures are collected: they are
+what let the app tell a complete reading from one that missed a line. Section 6
+gains a per-receipt deletion route **by email**, not in-app. The bold claim that
+RecallGuard never stores the photo is unchanged and stays true.
+
+**Why:** the app began storing per-line prices on 2026-09-06 to reconcile a parse
+against the receipt's own printed subtotal, after a scan produced three review
+cards that were all wrong. Prices are purchase history whether they sit in a
+numeric column or a photograph, so the disclosure is required and the App Privacy
+questionnaire needs **Financial Info → Purchase History** added.
+
+The deletion route is email rather than in-app on purpose. The database now
+permits a user to delete one receipt, but no screen offers it, and a policy that
+describes a control the app does not have is worse than one that describes a
+slower control it honours. When that UI ships, this paragraph changes with it.
+
 ## 2026-08-31 — The privacy policy states Anthropic's real 30-day retention
 
 `fix/rg-privacy-retention` · `23e00aa` · `src/pages/RecallGuardPrivacy.jsx`
