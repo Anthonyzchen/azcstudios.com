@@ -119,14 +119,22 @@ const RecallGuardPrivacy = () => {
             against your specific items.
           </li>
           <li>
-            <Term>Receipt content</Term> &mdash; if you photograph a receipt, the
-            line-item text extracted from it, plus the retailer name when it can
-            be identified. <Term>RecallGuard never stores the photo.</Term> It is
-            sent once to Anthropic for text extraction and discarded when the
-            response comes back; only the extracted lines are saved. Sending it
+            <Term>Receipt content</Term> &mdash; if you photograph a receipt,
+            the line-item text extracted from it, the price and quantity of each
+            item, the receipt's own subtotal and item count, and the retailer,
+            store number and purchase date when they can be identified.{" "}
+            <Term>RecallGuard never stores the photo.</Term> It is sent once to
+            Anthropic for text extraction and discarded when the response comes
+            back; only the extracted text and figures are saved. Sending it
             requires your permission, which RecallGuard asks for the first time
             you scan a receipt and which you can withdraw at any time in
             Settings under Privacy.
+          </li>
+          <li>
+            <Term>Corrections you make</Term> &mdash; when you rename a line
+            RecallGuard read wrongly, the corrected name is kept alongside the
+            original. It is used to find where the reader fails and fix it, and
+            for nothing else.
           </li>
         </Bullets>
 
@@ -204,6 +212,12 @@ const RecallGuardPrivacy = () => {
           <li>
             To operate premium features (pantry matching, receipt import) if you
             subscribe.
+          </li>
+          <li>
+            To check that we read your receipt correctly. The prices and item
+            count on a receipt are what let the app tell a complete reading from
+            one that missed a line, and to warn you rather than quietly add the
+            wrong thing to your pantry.
           </li>
           <li>To respond to support requests you send us.</li>
           <li>
@@ -414,9 +428,15 @@ const RecallGuardPrivacy = () => {
           We keep your account information for as long as your account exists.
         </Paragraph>
         <Paragraph className="mb-4">
-          To delete it, open <Term>Settings &rarr; Delete my account</Term> in
-          the app. Deletion runs immediately: your profile, preferences,
-          allergen profile, pantry, receipt line items, household links, and
+          To have a single receipt and everything read off it removed, email{" "}
+          <SupportEmail /> from the address on file and tell us which one. We do
+          it within 30 days, and usually the same week.
+        </Paragraph>
+        <Paragraph className="mb-4">
+          To delete everything, open{" "}
+          <Term>Settings &rarr; Delete my account</Term> in the app. Deletion
+          runs immediately: your profile, preferences, allergen profile, pantry,
+          receipt line items and the prices read off them, household links, and
           referral records are removed in a single cascade, and the account
           cannot be recovered afterwards. You can also email <SupportEmail />{" "}
           from the address on file and we will do it for you within 30 days.
