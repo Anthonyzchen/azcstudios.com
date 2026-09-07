@@ -544,7 +544,7 @@ const RecallGuardPrivacy = () => {
         </Paragraph>
         <SubHeading>Turn off AI receipt reading</SubHeading>
         <Paragraph className="mb-4">
-          <Term>Settings &rarr; Privacy &rarr; Read receipts with AI.</Term>{" "}
+          <Term>Settings &rarr; Privacy &rarr; AI receipt reading.</Term>{" "}
           RecallGuard asks for this the first time you scan a receipt, and it is
           off until you allow it. Turning it off stops receipt photos being sent
           to Anthropic; barcode scanning and adding items by hand are unaffected
